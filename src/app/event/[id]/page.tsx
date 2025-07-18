@@ -19,7 +19,7 @@ export default async function EventPage({ params }: EventPageProps) {
       <div className="min-h-screen bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 flex items-center justify-center">
         <div className="bg-white rounded-xl shadow-lg p-8 text-center">
           <svg className="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <title>TODO</title>
+            <title>エラーアイコン</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
