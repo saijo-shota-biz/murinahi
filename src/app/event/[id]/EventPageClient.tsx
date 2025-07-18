@@ -126,7 +126,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <title>TODO</title>
+              <title>前の月へ</title>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -139,7 +139,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <title>TODO</title>
+              <title>次の月へ</title>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -212,7 +212,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
           {isSaving && (
             <div className="flex items-center gap-1 text-gray-400">
               <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
-                <title>TODO</title>
+                <title>読み込み中</title>
                 <circle
                   className="opacity-25"
                   cx="12"
@@ -234,7 +234,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
           {showSaveSuccess && (
             <div className="flex items-center gap-1 text-green-500">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <title>TODO</title>
+                <title>保存完了</title>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
               <span>保存しました</span>
@@ -353,7 +353,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
               className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200 flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <title>TODO</title>
+                <title>URLをコピー</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

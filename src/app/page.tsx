@@ -78,7 +78,7 @@ export default function Home() {
                 {isCreating ? (
                   <>
                     <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <title>loading...</title>
+                      <title>読み込み中</title>
                       <circle
                         className="opacity-25"
                         cx="12"
@@ -99,7 +99,7 @@ export default function Home() {
                 ) : (
                   <>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <title>create event</title>
+                      <title>イベント作成</title>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
                     イベントを作る
@@ -118,7 +118,7 @@ export default function Home() {
                   >
                     <span className="text-green-600 text-sm font-medium flex items-center gap-1">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <title>copied</title>
+                        <title>コピー完了</title>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       コピーしました！
@@ -136,7 +136,7 @@ export default function Home() {
                     className="flex-shrink-0 bg-gray-800 hover:bg-gray-900 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <title>copy</title>
+                      <title>コピー</title>
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -155,7 +155,7 @@ export default function Home() {
                   >
                     イベントページへ移動
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <title>arrow right</title>
+                      <title>右矢印</title>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </a>
@@ -169,7 +169,7 @@ export default function Home() {
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4 mx-auto">
                 <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <title>calendar</title>
+                  <title>カレンダーアイコン</title>
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -185,7 +185,7 @@ export default function Home() {
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mb-4 mx-auto">
                 <svg className="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <title>user</title>
+                  <title>ユーザーアイコン</title>
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -201,7 +201,7 @@ export default function Home() {
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mb-4 mx-auto">
                 <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <title>clock</title>
+                  <title>稲妻アイコン</title>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
