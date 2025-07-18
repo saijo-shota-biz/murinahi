@@ -38,28 +38,28 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        <div className="absolute -top-20 -right-20 md:-top-40 md:-right-40 w-40 h-40 md:w-80 md:h-80 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute -bottom-20 -left-20 md:-bottom-40 md:-left-40 w-40 h-40 md:w-80 md:h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 md:w-80 md:h-80 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-16">
         <div className="max-w-2xl w-full text-center">
           {/* Logo/Title with animation */}
-          <div className="mb-8 animate-fade-in-down">
-            <h1 className="text-6xl md:text-7xl font-black text-gray-800 mb-2 tracking-tight">
+          <div className="mb-8 animate-fade-in-down mt-8">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-gray-800 mb-2 tracking-tight">
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-pink-500">ムリな日</span>
               <span className="text-gray-800">カレンダー</span>
             </h1>
             <div className="flex items-center justify-center gap-2 text-gray-600">
-              <div className="h-px bg-gray-300 w-16"></div>
-              <p className="text-sm font-medium uppercase tracking-wide">Since 2025</p>
-              <div className="h-px bg-gray-300 w-16"></div>
+              <div className="h-px bg-gray-300 w-12 sm:w-16"></div>
+              <p className="text-xs sm:text-sm font-medium uppercase tracking-wide">Since 2025</p>
+              <div className="h-px bg-gray-300 w-12 sm:w-16"></div>
             </div>
           </div>
 
           {/* Tagline */}
-          <p className="text-xl md:text-2xl text-gray-700 mb-12 leading-relaxed animate-fade-in-up">
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-700 mb-8 sm:mb-12 leading-relaxed animate-fade-in-up px-4">
             参加できない日だけ選ぶ、
             <br />
             <span className="font-bold text-red-500">逆転の発想</span>
@@ -72,7 +72,7 @@ export default function Home() {
               type="button"
               onClick={handleClickTest}
               disabled={isCreating}
-              className="group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed animate-pulse-slow"
+              className="group relative inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold text-white transition-all duration-200 bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed animate-pulse-slow"
             >
               <span className="relative z-10 flex items-center gap-2">
                 {isCreating ? (
@@ -110,8 +110,8 @@ export default function Home() {
             </button>
           ) : (
             <div className="animate-fade-in">
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-6 border border-gray-100">
-                <div className="flex items-center justify-between gap-4 mb-4">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-4 sm:p-6 border border-gray-100">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 mb-4">
                   <p className="text-sm font-medium text-gray-600">作成完了！URLを共有してください</p>
                   <div
                     className={`transition-all duration-300 ${justCopied ? "opacity-100 transform translate-y-0" : "opacity-0 transform -translate-y-2"}`}
@@ -126,14 +126,14 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 bg-gray-50 rounded-lg px-4 py-3 font-mono text-sm text-gray-700 overflow-x-auto">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full">
+                  <div className="flex-1 bg-gray-50 rounded-lg px-3 sm:px-4 py-2 sm:py-3 font-mono text-xs sm:text-sm text-gray-700 overflow-x-auto">
                     {url}
                   </div>
                   <button
                     type="button"
                     onClick={() => copyToClipboard(url)}
-                    className="flex-shrink-0 bg-gray-800 hover:bg-gray-900 text-white px-4 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2"
+                    className="flex-shrink-0 bg-gray-800 hover:bg-gray-900 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <title>copy</title>
@@ -165,7 +165,7 @@ export default function Home() {
           )}
 
           {/* Features */}
-          <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 animate-fade-in-up animation-delay-500">
+          <div className="mt-16 sm:mt-20 mb-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 animate-fade-in-up animation-delay-500 px-4 sm:px-0">
             <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4 mx-auto">
                 <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,14 +212,14 @@ export default function Home() {
         </div>
 
         {/* Footer */}
-        <footer className="absolute bottom-6 left-0 right-0 text-center">
+        <footer className="mt-auto pt-8 pb-4 sm:pb-6 text-center px-4">
           <p className="text-xs text-gray-500">© 2025 ムリな日カレンダー ・ 完全無料でご利用いただけます</p>
         </footer>
       </div>
 
       <style jsx>{`
         @keyframes blob {
-          0% {
+          0% {//
             transform: translate(0px, 0px) scale(1);
           }
           33% {
