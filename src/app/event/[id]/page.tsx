@@ -5,13 +5,11 @@ import EventPageClient from "./EventPageClient";
 const redis = Redis.fromEnv();
 
 interface EventPageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 export default async function EventPage({ params }: EventPageProps) {
-  const { id } = params;
+  const { id } = await params;
 
   // データ取得
   const event = await redis.get<Event>(`event:${id}`);
