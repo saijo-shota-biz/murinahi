@@ -96,13 +96,15 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   };
 
   const formatDate = (date: Date) => {
-    return date.toISOString().split("T")[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   const formatDisplayDate = (dateStr: string) => {
-    const date = new Date(`${dateStr}T00:00:00`);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
     const weekday = ["日", "月", "火", "水", "木", "金", "土"][date.getDay()];
     return `${month}/${day}(${weekday})`;
   };
@@ -154,7 +156,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
               return (
                 <div
                   key={`empty-${
-                    // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                    // biome-ignore lint/suspicious/noArrayIndexKey: Empty divs need unique keys
                     index
                   }`}
                 />
