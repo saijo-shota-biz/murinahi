@@ -20,7 +20,7 @@ export async function createEvent() {
   return eventId;
 }
 
-export async function updateParticipant(eventId: string, userName: string, ngDates: string[]) {
+export async function updateParticipant(eventId: string, userId: string, ngDates: string[]) {
   "use server";
 
   const redis = Redis.fromEnv();
@@ -32,7 +32,7 @@ export async function updateParticipant(eventId: string, userName: string, ngDat
       if (!event) throw new Error("Event not found");
 
       // 参加者データを更新
-      event.participants[userName] = { ng_dates: ngDates };
+      event.participants[userId] = { ng_dates: ngDates };
 
       // 保存（TTLをリセット）
       await redis.setex(`event:${eventId}`, 30 * 24 * 60 * 60, JSON.stringify(event));

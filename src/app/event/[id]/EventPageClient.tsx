@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { v4 as uuidv4 } from 'uuid';
 import { updateParticipant } from "@/app/actions";
 import type { Event } from "@/app/model/Event";
 
@@ -9,43 +10,53 @@ interface EventPageClientProps {
 }
 
 export default function EventPageClient({ event }: EventPageClientProps) {
-  const [userName, setUserName] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [clipboardSupported, setClipboardSupported] = useState<boolean | null>(null);
 
-  // ローカルストレージから名前を取得
+
+  // 自動的にユーザーIDを生成・取得
   useEffect(() => {
-    const savedName = localStorage.getItem("userName");
-    if (savedName) {
-      setUserName(savedName);
-      // 既存の参加者なら選択済み日付を復元
-      if (event.participants[savedName]) {
-        setSelectedDates(new Set(event.participants[savedName].ng_dates));
+    try {
+      let id = localStorage.getItem("userId");
+      if (!id) {
+        id = uuidv4();
+        try {
+          localStorage.setItem("userId", id);
+        } catch (error) {
+          console.error("localStorage保存エラー:", error);
+          // localStorageが使えない場合でもアプリケーションは動作継続
+        }
       }
+      setUserId(id);
+      
+      // 既存の参加者なら選択済み日付を復元
+      if (event.participants[id]) {
+        setSelectedDates(new Set(event.participants[id].ng_dates));
+      }
+    } catch (error) {
+      console.error("ユーザーID初期化エラー:", error);
+      // エラーが発生してもランダムIDを生成して継続
+      setUserId(uuidv4());
     }
   }, [event.participants]);
 
-  // 名前が変更されたら選択をリセット
+  // Clipboard APIのサポート状況をチェック
   useEffect(() => {
-    if (userName && event.participants[userName]) {
-      setSelectedDates(new Set(event.participants[userName].ng_dates));
-    } else {
-      setSelectedDates(new Set());
-    }
-  }, [userName, event.participants]);
+    setClipboardSupported(
+      typeof navigator !== 'undefined' && 
+      !!navigator.clipboard && 
+      window.isSecureContext
+    );
+  }, []);
 
-  const handleNameChange = (name: string) => {
-    setUserName(name);
-    localStorage.setItem("userName", name);
-  };
 
   const handleDateClick = (date: string) => {
-    if (!userName) {
-      alert("先に名前を入力してください");
-      return;
-    }
+    if (!userId) return;
 
     const newSelectedDates = new Set(selectedDates);
     if (newSelectedDates.has(date)) {
@@ -55,21 +66,26 @@ export default function EventPageClient({ event }: EventPageClientProps) {
     }
     setSelectedDates(newSelectedDates);
 
-    // 自動保存
-    saveData(Array.from(newSelectedDates));
+    // 自動保存 - Promiseを適切にハンドリング
+    saveData(Array.from(newSelectedDates)).catch((error) => {
+      console.error("自動保存エラー:", error);
+    });
   };
 
   const saveData = async (dates: string[]) => {
-    if (!userName) return;
+    if (!userId) return;
 
     setIsSaving(true);
+    setSaveError(null);
     try {
-      await updateParticipant(event.id, userName, dates);
+      await updateParticipant(event.id, userId, dates);
+      
       setShowSaveSuccess(true);
       setTimeout(() => setShowSaveSuccess(false), 2000);
     } catch (error) {
       console.error("保存に失敗しました:", error);
-      alert("保存に失敗しました");
+      setSaveError("保存に失敗しました。もう一度お試しください。");
+      setTimeout(() => setSaveError(null), 5000);
     } finally {
       setIsSaving(false);
     }
@@ -102,16 +118,48 @@ export default function EventPageClient({ event }: EventPageClientProps) {
     return `${year}-${month}-${day}`;
   };
 
-  const formatDisplayDate = (dateStr: string) => {
-    const [year, month, day] = dateStr.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
-    const weekday = ["日", "月", "火", "水", "木", "金", "土"][date.getDay()];
-    return `${month}/${day}(${weekday})`;
-  };
+
+  // NG日カウントをメモ化して最適化 - 他の人のNG日 + 自分のリアルタイム選択
+  const ngCountsByDate = useMemo(() => {
+    const counts: Record<string, number> = {};
+    
+    // 他の人のNG日をカウント
+    Object.entries(event.participants).forEach(([participantId, participant]) => {
+      if (participantId !== userId) {
+        participant.ng_dates.forEach(date => {
+          counts[date] = (counts[date] || 0) + 1;
+        });
+      }
+    });
+    
+    // 自分の現在の選択をカウントに追加
+    if (userId) {
+      selectedDates.forEach(date => {
+        counts[date] = (counts[date] || 0) + 1;
+      });
+    }
+    
+    return counts;
+  }, [event.participants, selectedDates, userId]);
 
   const getNGCountForDate = (dateStr: string) => {
-    return Object.values(event.participants).filter((p) => p.ng_dates.includes(dateStr)).length;
+    return ngCountsByDate[dateStr] || 0;
   };
+
+  const handleCopyUrl = async () => {
+    const url = window.location.href;
+    try {
+      if (!navigator.clipboard || !window.isSecureContext) {
+        throw new Error("Clipboard API not supported");
+      }
+      await navigator.clipboard.writeText(url);
+      alert("URLをコピーしました！");
+    } catch (error) {
+      console.error("クリップボードコピーエラー:", error);
+      alert(`コピーに失敗しました。URL: ${url}`);
+    }
+  };
+
 
   const renderCalendar = () => {
     const days = getDaysInMonth(currentMonth);
@@ -166,23 +214,24 @@ export default function EventPageClient({ event }: EventPageClientProps) {
             const isSelected = selectedDates.has(dateStr);
             const ngCount = getNGCountForDate(dateStr);
             const isToday = formatDate(new Date()) === dateStr;
+            const isPastDate = day < new Date(new Date().setHours(0, 0, 0, 0));
 
             return (
               <button
                 type="button"
                 key={dateStr}
                 onClick={() => handleDateClick(dateStr)}
-                disabled={!userName}
+                disabled={!userId || isPastDate}
                 className={`
                   relative aspect-square rounded-lg font-medium text-sm
-                  transition-all duration-200 transform hover:scale-105
-                  ${!userName ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
-                  ${isToday ? "ring-2 ring-blue-400 ring-offset-2" : ""}
+                  transition-all duration-200
+                  ${!userId || isPastDate ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:shadow-md"}
+                  ${isToday ? "ring-2 ring-blue-400" : ""}
                   ${
                     isSelected
                       ? "bg-red-500 text-white shadow-md"
                       : ngCount > 0
-                        ? `bg-red-${Math.min(ngCount * 100, 400)} text-red-900`
+                        ? "bg-red-300 text-red-900 hover:bg-red-400"
                         : "bg-gray-50 hover:bg-gray-100 text-gray-700"
                   }
                 `}
@@ -205,7 +254,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
               <span>あなたのNG日</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-4 h-4 bg-red-100 rounded"></div>
+              <div className="w-4 h-4 bg-red-300 rounded"></div>
               <span>他の人のNG日</span>
             </div>
           </div>
@@ -240,6 +289,15 @@ export default function EventPageClient({ event }: EventPageClientProps) {
               <span>保存しました</span>
             </div>
           )}
+          {saveError && (
+            <div className="flex items-center gap-1 text-red-500">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <title>保存エラー</title>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{saveError}</span>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -262,21 +320,6 @@ export default function EventPageClient({ event }: EventPageClientProps) {
           <p className="text-gray-600">参加できない日をタップしてください</p>
         </div>
 
-        {/* Name Input */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <label htmlFor="yourname" className="block text-sm font-medium text-gray-700 mb-2">
-            あなたのお名前
-          </label>
-          <input
-            id="yourname"
-            type="text"
-            value={userName}
-            onChange={(e) => handleNameChange(e.target.value)}
-            placeholder="名前を入力してください"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
-          />
-          {!userName && <p className="mt-2 text-xs text-red-500">※名前を入力すると日付を選択できます</p>}
-        </div>
 
         {/* Month Tabs */}
         <div className="flex gap-2 mb-4">
@@ -302,69 +345,39 @@ export default function EventPageClient({ event }: EventPageClientProps) {
         {/* Calendar */}
         {renderCalendar()}
 
-        {/* Participants List */}
+        {/* Summary */}
         <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">参加者のNG日</h2>
-
-          {Object.keys(event.participants).length === 0 ? (
-            <p className="text-gray-500 text-center py-8">まだ誰も登録していません</p>
-          ) : (
-            <div className="space-y-4">
-              {Object.entries(event.participants).map(([name, data]) => (
-                <div key={name} className="border-b border-gray-100 pb-3 last:border-0">
-                  <div className="flex items-start justify-between">
-                    <h3 className="font-medium text-gray-800 flex items-center gap-2">
-                      {name}
-                      {name === userName && (
-                        <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">あなた</span>
-                      )}
-                    </h3>
-                    <span className="text-xs text-gray-500">{data.ng_dates.length}日</span>
-                  </div>
-                  <div className="mt-1">
-                    {data.ng_dates.length === 0 ? (
-                      <span className="text-sm text-gray-500">なし</span>
-                    ) : (
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {data.ng_dates.sort().map((date) => (
-                          <span key={date} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                            {formatDisplayDate(date)}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* URL Share */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-4 mt-6">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600">このURLを共有してメンバーを招待</p>
-            <button
-              type="button"
-              onClick={async () => {
-                await navigator.clipboard.writeText(window.location.href);
-                alert("URLをコピーしました！");
-              }}
-              className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200 flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <title>URLをコピー</title>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                />
-              </svg>
-              URLをコピー
-            </button>
+          <h2 className="text-lg font-bold text-gray-800 mb-4">集計</h2>
+          <div className="text-sm text-gray-600">
+            <p>現在 <span className="font-bold text-gray-800">{Object.keys(event.participants).length}名</span> が参加中</p>
+            <p className="mt-2 text-xs text-gray-500">カレンダーの数字は、その日にNGな人数を表示しています</p>
           </div>
         </div>
+
+        {/* URL Share - Clipboard APIがサポートされている場合のみ表示 */}
+        {clipboardSupported && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-4 mt-6">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-600">このURLを共有してメンバーを招待</p>
+              <button
+                type="button"
+                onClick={handleCopyUrl}
+                className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200 flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <title>URLをコピー</title>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                URLをコピー
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
