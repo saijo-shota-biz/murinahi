@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { v4 as uuidv4 } from 'uuid';
 import { updateParticipant } from "@/app/actions";
 import type { Event } from "@/app/model/Event";
 
@@ -14,27 +15,15 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+  const [clipboardSupported, setClipboardSupported] = useState<boolean | null>(null);
 
-  // UUID生成のフォールバック関数をuseCallbackでメモ化
-  const generateUUID = useCallback(() => {
-    // crypto.randomUUID()が利用可能な場合はそれを使用
-    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-      return crypto.randomUUID();
-    }
-    // フォールバック: タイムスタンプとランダム値を組み合わせた簡易UUID
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  }, []);
 
   // 自動的にユーザーIDを生成・取得
   useEffect(() => {
     try {
       let id = localStorage.getItem("userId");
       if (!id) {
-        id = generateUUID();
+        id = uuidv4();
         try {
           localStorage.setItem("userId", id);
         } catch (error) {
@@ -51,9 +40,18 @@ export default function EventPageClient({ event }: EventPageClientProps) {
     } catch (error) {
       console.error("ユーザーID初期化エラー:", error);
       // エラーが発生してもランダムIDを生成して継続
-      setUserId(generateUUID());
+      setUserId(uuidv4());
     }
-  }, [event.participants, generateUUID]);
+  }, [event.participants]);
+
+  // Clipboard APIのサポート状況をチェック
+  useEffect(() => {
+    setClipboardSupported(
+      typeof navigator !== 'undefined' && 
+      !!navigator.clipboard && 
+      window.isSecureContext
+    );
+  }, []);
 
 
   const handleDateClick = (date: string) => {
@@ -233,7 +231,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
             </div>
             <div className="flex items-center gap-1">
               <div className="w-4 h-4 bg-red-100 rounded"></div>
-              <span>NG人数</span>
+              <span>他の人のNG日</span>
             </div>
           </div>
           {isSaving && (
@@ -323,56 +321,39 @@ export default function EventPageClient({ event }: EventPageClientProps) {
           </div>
         </div>
 
-        {/* URL Share */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-4 mt-6">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600">このURLを共有してメンバーを招待</p>
-            <button
-              type="button"
-              onClick={async () => {
-                const url = window.location.href;
-                try {
-                  // Clipboard APIが利用可能かチェック
-                  if (navigator.clipboard && window.isSecureContext) {
+        {/* URL Share - Clipboard APIがサポートされている場合のみ表示 */}
+        {clipboardSupported && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-4 mt-6">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-600">このURLを共有してメンバーを招待</p>
+              <button
+                type="button"
+                onClick={async () => {
+                  const url = window.location.href;
+                  try {
                     await navigator.clipboard.writeText(url);
                     alert("URLをコピーしました！");
-                  } else {
-                    // フォールバック: テキストエリアを使用
-                    const textArea = document.createElement('textarea');
-                    textArea.value = url;
-                    textArea.style.position = 'fixed';
-                    textArea.style.opacity = '0';
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    try {
-                      document.execCommand('copy');
-                      alert("URLをコピーしました！");
-                    } catch (_err) {
-                      alert(`コピーに失敗しました。URL: ${url}`);
-                    } finally {
-                      document.body.removeChild(textArea);
-                    }
+                  } catch (error) {
+                    console.error("クリップボードコピーエラー:", error);
+                    alert(`コピーに失敗しました。URL: ${url}`);
                   }
-                } catch (error) {
-                  console.error("クリップボードコピーエラー:", error);
-                  alert(`コピーに失敗しました。URL: ${url}`);
-                }
-              }}
-              className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200 flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <title>URLをコピー</title>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                />
-              </svg>
-              URLをコピー
-            </button>
+                }}
+                className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200 flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <title>URLをコピー</title>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                URLをコピー
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
