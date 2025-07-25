@@ -9,43 +9,30 @@ interface EventPageClientProps {
 }
 
 export default function EventPageClient({ event }: EventPageClientProps) {
-  const [userName, setUserName] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
 
-  // ローカルストレージから名前を取得
+  // 自動的にユーザーIDを生成・取得
   useEffect(() => {
-    const savedName = localStorage.getItem("userName");
-    if (savedName) {
-      setUserName(savedName);
-      // 既存の参加者なら選択済み日付を復元
-      if (event.participants[savedName]) {
-        setSelectedDates(new Set(event.participants[savedName].ng_dates));
-      }
+    let id = localStorage.getItem("userId");
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem("userId", id);
+    }
+    setUserId(id);
+    
+    // 既存の参加者なら選択済み日付を復元
+    if (event.participants[id]) {
+      setSelectedDates(new Set(event.participants[id].ng_dates));
     }
   }, [event.participants]);
 
-  // 名前が変更されたら選択をリセット
-  useEffect(() => {
-    if (userName && event.participants[userName]) {
-      setSelectedDates(new Set(event.participants[userName].ng_dates));
-    } else {
-      setSelectedDates(new Set());
-    }
-  }, [userName, event.participants]);
-
-  const handleNameChange = (name: string) => {
-    setUserName(name);
-    localStorage.setItem("userName", name);
-  };
 
   const handleDateClick = (date: string) => {
-    if (!userName) {
-      alert("先に名前を入力してください");
-      return;
-    }
+    if (!userId) return;
 
     const newSelectedDates = new Set(selectedDates);
     if (newSelectedDates.has(date)) {
@@ -60,11 +47,11 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   };
 
   const saveData = async (dates: string[]) => {
-    if (!userName) return;
+    if (!userId) return;
 
     setIsSaving(true);
     try {
-      await updateParticipant(event.id, userName, dates);
+      await updateParticipant(event.id, userId, dates);
       setShowSaveSuccess(true);
       setTimeout(() => setShowSaveSuccess(false), 2000);
     } catch (error) {
@@ -102,12 +89,6 @@ export default function EventPageClient({ event }: EventPageClientProps) {
     return `${year}-${month}-${day}`;
   };
 
-  const formatDisplayDate = (dateStr: string) => {
-    const [year, month, day] = dateStr.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
-    const weekday = ["日", "月", "火", "水", "木", "金", "土"][date.getDay()];
-    return `${month}/${day}(${weekday})`;
-  };
 
   const getNGCountForDate = (dateStr: string) => {
     return Object.values(event.participants).filter((p) => p.ng_dates.includes(dateStr)).length;
@@ -172,11 +153,11 @@ export default function EventPageClient({ event }: EventPageClientProps) {
                 type="button"
                 key={dateStr}
                 onClick={() => handleDateClick(dateStr)}
-                disabled={!userName}
+                disabled={!userId}
                 className={`
                   relative aspect-square rounded-lg font-medium text-sm
                   transition-all duration-200 transform hover:scale-105
-                  ${!userName ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
+                  ${!userId ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
                   ${isToday ? "ring-2 ring-blue-400 ring-offset-2" : ""}
                   ${
                     isSelected
@@ -206,7 +187,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
             </div>
             <div className="flex items-center gap-1">
               <div className="w-4 h-4 bg-red-100 rounded"></div>
-              <span>他の人のNG日</span>
+              <span>NG人数</span>
             </div>
           </div>
           {isSaving && (
@@ -262,21 +243,6 @@ export default function EventPageClient({ event }: EventPageClientProps) {
           <p className="text-gray-600">参加できない日をタップしてください</p>
         </div>
 
-        {/* Name Input */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <label htmlFor="yourname" className="block text-sm font-medium text-gray-700 mb-2">
-            あなたのお名前
-          </label>
-          <input
-            id="yourname"
-            type="text"
-            value={userName}
-            onChange={(e) => handleNameChange(e.target.value)}
-            placeholder="名前を入力してください"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
-          />
-          {!userName && <p className="mt-2 text-xs text-red-500">※名前を入力すると日付を選択できます</p>}
-        </div>
 
         {/* Month Tabs */}
         <div className="flex gap-2 mb-4">
@@ -302,42 +268,13 @@ export default function EventPageClient({ event }: EventPageClientProps) {
         {/* Calendar */}
         {renderCalendar()}
 
-        {/* Participants List */}
+        {/* Summary */}
         <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">参加者のNG日</h2>
-
-          {Object.keys(event.participants).length === 0 ? (
-            <p className="text-gray-500 text-center py-8">まだ誰も登録していません</p>
-          ) : (
-            <div className="space-y-4">
-              {Object.entries(event.participants).map(([name, data]) => (
-                <div key={name} className="border-b border-gray-100 pb-3 last:border-0">
-                  <div className="flex items-start justify-between">
-                    <h3 className="font-medium text-gray-800 flex items-center gap-2">
-                      {name}
-                      {name === userName && (
-                        <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">あなた</span>
-                      )}
-                    </h3>
-                    <span className="text-xs text-gray-500">{data.ng_dates.length}日</span>
-                  </div>
-                  <div className="mt-1">
-                    {data.ng_dates.length === 0 ? (
-                      <span className="text-sm text-gray-500">なし</span>
-                    ) : (
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {data.ng_dates.sort().map((date) => (
-                          <span key={date} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                            {formatDisplayDate(date)}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <h2 className="text-lg font-bold text-gray-800 mb-4">集計</h2>
+          <div className="text-sm text-gray-600">
+            <p>現在 <span className="font-bold text-gray-800">{Object.keys(event.participants).length}名</span> が参加中</p>
+            <p className="mt-2 text-xs text-gray-500">カレンダーの数字は、その日にNGな人数を表示しています</p>
+          </div>
         </div>
 
         {/* URL Share */}
