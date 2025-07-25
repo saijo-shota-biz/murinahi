@@ -130,10 +130,6 @@ export default function EventPageClient({ event }: EventPageClientProps) {
     return ngCountsByDate[dateStr] || 0;
   };
 
-  // 背景色のクラスを取得する関数 - 1人でもNGがいれば赤300で統一
-  const getBgClass = (count: number) => {
-    return count > 0 ? 'bg-red-300' : 'bg-red-100';
-  };
 
   const renderCalendar = () => {
     const days = getDaysInMonth(currentMonth);
@@ -204,7 +200,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
                     isSelected
                       ? "bg-red-500 text-white shadow-md"
                       : ngCount > 0
-                        ? `${getBgClass(ngCount)} text-red-900`
+                        ? "bg-red-300 text-red-900"
                         : "bg-gray-50 hover:bg-gray-100 text-gray-700"
                   }
                 `}
