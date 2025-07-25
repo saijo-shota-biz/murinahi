@@ -16,7 +16,6 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [clipboardSupported, setClipboardSupported] = useState<boolean | null>(null);
-  const [clientParticipants, setClientParticipants] = useState(event.participants);
 
 
   // 自動的にユーザーIDを生成・取得
@@ -39,16 +38,16 @@ export default function EventPageClient({ event }: EventPageClientProps) {
       console.log("event.participants:", event.participants); // デバッグ用
       
       // 既存の参加者なら選択済み日付を復元
-      if (clientParticipants[id]) {
-        console.log("既存参加者のNG日を復元:", clientParticipants[id].ng_dates); // デバッグ用
-        setSelectedDates(new Set(clientParticipants[id].ng_dates));
+      if (event.participants[id]) {
+        console.log("既存参加者のNG日を復元:", event.participants[id].ng_dates); // デバッグ用
+        setSelectedDates(new Set(event.participants[id].ng_dates));
       }
     } catch (error) {
       console.error("ユーザーID初期化エラー:", error);
       // エラーが発生してもランダムIDを生成して継続
       setUserId(uuidv4());
     }
-  }, [event.participants, clientParticipants]);
+  }, [event.participants]);
 
   // Clipboard APIのサポート状況をチェック
   useEffect(() => {
@@ -91,13 +90,6 @@ export default function EventPageClient({ event }: EventPageClientProps) {
     try {
       await updateParticipant(event.id, userId, dates);
       
-      // クライアントデータを更新
-      setClientParticipants(prev => ({
-        ...prev,
-        [userId]: {
-          ng_dates: dates
-        }
-      }));
       
       setShowSaveSuccess(true);
       setTimeout(() => setShowSaveSuccess(false), 2000);
@@ -137,17 +129,29 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   };
 
 
-  // NG日カウントをメモ化して最適化 - クライアントデータを使用
+  // NG日カウントをメモ化して最適化 - 他の人のNG日 + 自分のリアルタイム選択
   const ngCountsByDate = useMemo(() => {
     const counts: Record<string, number> = {};
-    Object.values(clientParticipants).forEach(p => {
-      p.ng_dates.forEach(date => {
+    
+    // 他の人のNG日をカウント
+    Object.entries(event.participants).forEach(([participantId, participant]) => {
+      if (participantId !== userId) {
+        participant.ng_dates.forEach(date => {
+          counts[date] = (counts[date] || 0) + 1;
+        });
+      }
+    });
+    
+    // 自分の現在の選択をカウントに追加
+    if (userId) {
+      selectedDates.forEach(date => {
         counts[date] = (counts[date] || 0) + 1;
       });
-    });
+    }
+    
     console.log("ngCountsByDate更新:", counts); // デバッグ用
     return counts;
-  }, [clientParticipants]);
+  }, [event.participants, selectedDates, userId]);
 
   const getNGCountForDate = (dateStr: string) => {
     return ngCountsByDate[dateStr] || 0;
@@ -333,7 +337,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
         <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
           <h2 className="text-lg font-bold text-gray-800 mb-4">集計</h2>
           <div className="text-sm text-gray-600">
-            <p>現在 <span className="font-bold text-gray-800">{Object.keys(clientParticipants).length}名</span> が参加中</p>
+            <p>現在 <span className="font-bold text-gray-800">{Object.keys(event.participants).length}名</span> が参加中</p>
             <p className="mt-2 text-xs text-gray-500">カレンダーの数字は、その日にNGな人数を表示しています</p>
           </div>
         </div>
