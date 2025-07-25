@@ -15,6 +15,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [clipboardSupported, setClipboardSupported] = useState<boolean | null>(null);
 
 
@@ -75,15 +76,16 @@ export default function EventPageClient({ event }: EventPageClientProps) {
     if (!userId) return;
 
     setIsSaving(true);
+    setSaveError(null);
     try {
       await updateParticipant(event.id, userId, dates);
-      
       
       setShowSaveSuccess(true);
       setTimeout(() => setShowSaveSuccess(false), 2000);
     } catch (error) {
       console.error("保存に失敗しました:", error);
-      alert("保存に失敗しました");
+      setSaveError("保存に失敗しました。もう一度お試しください。");
+      setTimeout(() => setSaveError(null), 5000);
     } finally {
       setIsSaving(false);
     }
@@ -147,6 +149,9 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   const handleCopyUrl = async () => {
     const url = window.location.href;
     try {
+      if (!navigator.clipboard || !window.isSecureContext) {
+        throw new Error("Clipboard API not supported");
+      }
       await navigator.clipboard.writeText(url);
       alert("URLをコピーしました！");
     } catch (error) {
@@ -282,6 +287,15 @@ export default function EventPageClient({ event }: EventPageClientProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
               <span>保存しました</span>
+            </div>
+          )}
+          {saveError && (
+            <div className="flex items-center gap-1 text-red-500">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <title>保存エラー</title>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{saveError}</span>
             </div>
           )}
         </div>
