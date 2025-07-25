@@ -62,12 +62,19 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   const handleDateClick = (date: string) => {
     if (!userId) return;
 
+    console.log("handleDateClick - userId:", userId); // デバッグ用
+    console.log("handleDateClick - date:", date); // デバッグ用
+    console.log("handleDateClick - selectedDates:", Array.from(selectedDates)); // デバッグ用
+
     const newSelectedDates = new Set(selectedDates);
     if (newSelectedDates.has(date)) {
+      console.log("日付を削除:", date); // デバッグ用
       newSelectedDates.delete(date);
     } else {
+      console.log("日付を追加:", date); // デバッグ用
       newSelectedDates.add(date);
     }
+    console.log("handleDateClick - newSelectedDates:", Array.from(newSelectedDates)); // デバッグ用
     setSelectedDates(newSelectedDates);
 
     // 自動保存 - Promiseを適切にハンドリング
