@@ -184,17 +184,18 @@ export default function EventPageClient({ event }: EventPageClientProps) {
             const isSelected = selectedDates.has(dateStr);
             const ngCount = getNGCountForDate(dateStr);
             const isToday = formatDate(new Date()) === dateStr;
+            const isPastDate = day < new Date(new Date().setHours(0, 0, 0, 0));
 
             return (
               <button
                 type="button"
                 key={dateStr}
                 onClick={() => handleDateClick(dateStr)}
-                disabled={!userId}
+                disabled={!userId || isPastDate}
                 className={`
                   relative aspect-square rounded-lg font-medium text-sm
                   transition-all duration-200
-                  ${!userId ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:shadow-md"}
+                  ${!userId || isPastDate ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:shadow-md"}
                   ${isToday ? "ring-2 ring-blue-400" : ""}
                   ${
                     isSelected
