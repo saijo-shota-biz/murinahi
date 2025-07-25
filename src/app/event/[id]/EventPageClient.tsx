@@ -22,10 +22,8 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   useEffect(() => {
     try {
       let id = localStorage.getItem("userId");
-      console.log("LocalStorage userId:", id); // デバッグ用
       if (!id) {
         id = uuidv4();
-        console.log("新しいUUID生成:", id); // デバッグ用
         try {
           localStorage.setItem("userId", id);
         } catch (error) {
@@ -34,12 +32,9 @@ export default function EventPageClient({ event }: EventPageClientProps) {
         }
       }
       setUserId(id);
-      console.log("設定されたuserId:", id); // デバッグ用
-      console.log("event.participants:", event.participants); // デバッグ用
       
       // 既存の参加者なら選択済み日付を復元
       if (event.participants[id]) {
-        console.log("既存参加者のNG日を復元:", event.participants[id].ng_dates); // デバッグ用
         setSelectedDates(new Set(event.participants[id].ng_dates));
       }
     } catch (error) {
@@ -62,19 +57,12 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   const handleDateClick = (date: string) => {
     if (!userId) return;
 
-    console.log("handleDateClick - userId:", userId); // デバッグ用
-    console.log("handleDateClick - date:", date); // デバッグ用
-    console.log("handleDateClick - selectedDates:", Array.from(selectedDates)); // デバッグ用
-
     const newSelectedDates = new Set(selectedDates);
     if (newSelectedDates.has(date)) {
-      console.log("日付を削除:", date); // デバッグ用
       newSelectedDates.delete(date);
     } else {
-      console.log("日付を追加:", date); // デバッグ用
       newSelectedDates.add(date);
     }
-    console.log("handleDateClick - newSelectedDates:", Array.from(newSelectedDates)); // デバッグ用
     setSelectedDates(newSelectedDates);
 
     // 自動保存 - Promiseを適切にハンドリング
@@ -149,7 +137,6 @@ export default function EventPageClient({ event }: EventPageClientProps) {
       });
     }
     
-    console.log("ngCountsByDate更新:", counts); // デバッグ用
     return counts;
   }, [event.participants, selectedDates, userId]);
 
