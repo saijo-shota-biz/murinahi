@@ -22,8 +22,10 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   useEffect(() => {
     try {
       let id = localStorage.getItem("userId");
+      console.log("LocalStorage userId:", id); // デバッグ用
       if (!id) {
         id = uuidv4();
+        console.log("新しいUUID生成:", id); // デバッグ用
         try {
           localStorage.setItem("userId", id);
         } catch (error) {
@@ -32,9 +34,12 @@ export default function EventPageClient({ event }: EventPageClientProps) {
         }
       }
       setUserId(id);
+      console.log("設定されたuserId:", id); // デバッグ用
+      console.log("event.participants:", event.participants); // デバッグ用
       
       // 既存の参加者なら選択済み日付を復元
       if (event.participants[id]) {
+        console.log("既存参加者のNG日を復元:", event.participants[id].ng_dates); // デバッグ用
         setSelectedDates(new Set(event.participants[id].ng_dates));
       }
     } catch (error) {
