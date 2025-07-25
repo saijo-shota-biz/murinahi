@@ -130,12 +130,9 @@ export default function EventPageClient({ event }: EventPageClientProps) {
     return ngCountsByDate[dateStr] || 0;
   };
 
-  // 背景色のクラスを取得する関数
+  // 背景色のクラスを取得する関数 - 1人でもNGがいれば赤400で統一
   const getBgClass = (count: number) => {
-    if (count >= 4) return 'bg-red-400';
-    if (count >= 3) return 'bg-red-300';
-    if (count >= 2) return 'bg-red-200';
-    return 'bg-red-100';
+    return count > 0 ? 'bg-red-400' : 'bg-red-100';
   };
 
   const renderCalendar = () => {
