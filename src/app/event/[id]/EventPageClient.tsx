@@ -193,14 +193,14 @@ export default function EventPageClient({ event }: EventPageClientProps) {
                 disabled={!userId}
                 className={`
                   relative aspect-square rounded-lg font-medium text-sm
-                  transition-all duration-200 transform hover:scale-105
-                  ${!userId ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
-                  ${isToday ? "ring-2 ring-blue-400 ring-offset-2" : ""}
+                  transition-all duration-200
+                  ${!userId ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:shadow-md"}
+                  ${isToday ? "ring-2 ring-blue-400" : ""}
                   ${
                     isSelected
                       ? "bg-red-500 text-white shadow-md"
                       : ngCount > 0
-                        ? "bg-red-300 text-red-900"
+                        ? "bg-red-300 text-red-900 hover:bg-red-400"
                         : "bg-gray-50 hover:bg-gray-100 text-gray-700"
                   }
                 `}
