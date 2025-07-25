@@ -130,9 +130,9 @@ export default function EventPageClient({ event }: EventPageClientProps) {
     return ngCountsByDate[dateStr] || 0;
   };
 
-  // 背景色のクラスを取得する関数 - 1人でもNGがいれば赤400で統一
+  // 背景色のクラスを取得する関数 - 1人でもNGがいれば赤300で統一
   const getBgClass = (count: number) => {
-    return count > 0 ? 'bg-red-400' : 'bg-red-100';
+    return count > 0 ? 'bg-red-300' : 'bg-red-100';
   };
 
   const renderCalendar = () => {
@@ -227,7 +227,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
               <span>あなたのNG日</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-4 h-4 bg-red-100 rounded"></div>
+              <div className="w-4 h-4 bg-red-300 rounded"></div>
               <span>他の人のNG日</span>
             </div>
           </div>
