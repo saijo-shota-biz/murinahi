@@ -135,6 +135,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
         counts[date] = (counts[date] || 0) + 1;
       });
     });
+    console.log("ngCountsByDate更新:", counts); // デバッグ用
     return counts;
   }, [event.participants]);
 
