@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { updateParticipant } from "@/app/actions";
 import type { Event } from "@/app/model/Event";
 
@@ -15,20 +15,45 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
 
+  // UUID生成のフォールバック関数をuseCallbackでメモ化
+  const generateUUID = useCallback(() => {
+    // crypto.randomUUID()が利用可能な場合はそれを使用
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    // フォールバック: タイムスタンプとランダム値を組み合わせた簡易UUID
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }, []);
+
   // 自動的にユーザーIDを生成・取得
   useEffect(() => {
-    let id = localStorage.getItem("userId");
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem("userId", id);
+    try {
+      let id = localStorage.getItem("userId");
+      if (!id) {
+        id = generateUUID();
+        try {
+          localStorage.setItem("userId", id);
+        } catch (error) {
+          console.error("localStorage保存エラー:", error);
+          // localStorageが使えない場合でもアプリケーションは動作継続
+        }
+      }
+      setUserId(id);
+      
+      // 既存の参加者なら選択済み日付を復元
+      if (event.participants[id]) {
+        setSelectedDates(new Set(event.participants[id].ng_dates));
+      }
+    } catch (error) {
+      console.error("ユーザーID初期化エラー:", error);
+      // エラーが発生してもランダムIDを生成して継続
+      setUserId(generateUUID());
     }
-    setUserId(id);
-    
-    // 既存の参加者なら選択済み日付を復元
-    if (event.participants[id]) {
-      setSelectedDates(new Set(event.participants[id].ng_dates));
-    }
-  }, [event.participants]);
+  }, [event.participants, generateUUID]);
 
 
   const handleDateClick = (date: string) => {
@@ -42,8 +67,10 @@ export default function EventPageClient({ event }: EventPageClientProps) {
     }
     setSelectedDates(newSelectedDates);
 
-    // 自動保存
-    saveData(Array.from(newSelectedDates));
+    // 自動保存 - Promiseを適切にハンドリング
+    saveData(Array.from(newSelectedDates)).catch((error) => {
+      console.error("自動保存エラー:", error);
+    });
   };
 
   const saveData = async (dates: string[]) => {
@@ -90,8 +117,27 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   };
 
 
+  // NG日カウントをメモ化して最適化
+  const ngCountsByDate = useMemo(() => {
+    const counts: Record<string, number> = {};
+    Object.values(event.participants).forEach(p => {
+      p.ng_dates.forEach(date => {
+        counts[date] = (counts[date] || 0) + 1;
+      });
+    });
+    return counts;
+  }, [event.participants]);
+
   const getNGCountForDate = (dateStr: string) => {
-    return Object.values(event.participants).filter((p) => p.ng_dates.includes(dateStr)).length;
+    return ngCountsByDate[dateStr] || 0;
+  };
+
+  // 背景色のクラスを取得する関数
+  const getBgClass = (count: number) => {
+    if (count >= 4) return 'bg-red-400';
+    if (count >= 3) return 'bg-red-300';
+    if (count >= 2) return 'bg-red-200';
+    return 'bg-red-100';
   };
 
   const renderCalendar = () => {
@@ -163,7 +209,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
                     isSelected
                       ? "bg-red-500 text-white shadow-md"
                       : ngCount > 0
-                        ? `bg-red-${Math.min(ngCount * 100, 400)} text-red-900`
+                        ? `${getBgClass(ngCount)} text-red-900`
                         : "bg-gray-50 hover:bg-gray-100 text-gray-700"
                   }
                 `}
@@ -284,8 +330,33 @@ export default function EventPageClient({ event }: EventPageClientProps) {
             <button
               type="button"
               onClick={async () => {
-                await navigator.clipboard.writeText(window.location.href);
-                alert("URLをコピーしました！");
+                const url = window.location.href;
+                try {
+                  // Clipboard APIが利用可能かチェック
+                  if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(url);
+                    alert("URLをコピーしました！");
+                  } else {
+                    // フォールバック: テキストエリアを使用
+                    const textArea = document.createElement('textarea');
+                    textArea.value = url;
+                    textArea.style.position = 'fixed';
+                    textArea.style.opacity = '0';
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                      document.execCommand('copy');
+                      alert("URLをコピーしました！");
+                    } catch (_err) {
+                      alert(`コピーに失敗しました。URL: ${url}`);
+                    } finally {
+                      document.body.removeChild(textArea);
+                    }
+                  }
+                } catch (error) {
+                  console.error("クリップボードコピーエラー:", error);
+                  alert(`コピーに失敗しました。URL: ${url}`);
+                }
               }}
               className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200 flex items-center gap-2"
             >
