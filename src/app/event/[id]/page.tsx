@@ -1,11 +1,34 @@
 import { Redis } from "@upstash/redis";
 import type { Event } from "@/app/model/Event";
+import type { Metadata } from "next";
 import EventPageClient from "./EventPageClient";
 
 const redis = Redis.fromEnv();
 
 interface EventPageProps {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
+  const { id } = await params;
+  
+  return {
+    title: `イベント ${id} の日程調整`,
+    description: "参加できない日を選んで、みんなの都合の良い日を見つけよう。ムリな日カレンダーで簡単日程調整。",
+    robots: {
+      index: false,
+      follow: true,
+    },
+    openGraph: {
+      title: `イベント ${id} | ムリな日カレンダー`,
+      description: "参加できない日を選んで、みんなの都合の良い日を見つけよう。",
+      images: [{
+        url: `/api/og?title=イベント ${id}&subtitle=日程調整中`,
+        width: 1200,
+        height: 630,
+      }],
+    },
+  };
 }
 
 export default async function EventPage({ params }: EventPageProps) {
