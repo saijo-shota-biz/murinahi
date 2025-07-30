@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { v4 as uuidv4 } from 'uuid';
+import { useEffect, useMemo, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { updateParticipant } from "@/app/actions";
 import type { Event } from "@/app/model/Event";
 
@@ -18,7 +18,6 @@ export default function EventPageClient({ event }: EventPageClientProps) {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [clipboardSupported, setClipboardSupported] = useState<boolean | null>(null);
 
-
   // 自動的にユーザーIDを生成・取得
   useEffect(() => {
     try {
@@ -33,7 +32,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
         }
       }
       setUserId(id);
-      
+
       // 既存の参加者なら選択済み日付を復元
       if (event.participants[id]) {
         setSelectedDates(new Set(event.participants[id].ng_dates));
@@ -47,13 +46,8 @@ export default function EventPageClient({ event }: EventPageClientProps) {
 
   // Clipboard APIのサポート状況をチェック
   useEffect(() => {
-    setClipboardSupported(
-      typeof navigator !== 'undefined' && 
-      !!navigator.clipboard && 
-      window.isSecureContext
-    );
+    setClipboardSupported(typeof navigator !== "undefined" && !!navigator.clipboard && window.isSecureContext);
   }, []);
-
 
   const handleDateClick = (date: string) => {
     if (!userId) return;
@@ -79,7 +73,7 @@ export default function EventPageClient({ event }: EventPageClientProps) {
     setSaveError(null);
     try {
       await updateParticipant(event.id, userId, dates);
-      
+
       setShowSaveSuccess(true);
       setTimeout(() => setShowSaveSuccess(false), 2000);
     } catch (error) {
@@ -113,32 +107,31 @@ export default function EventPageClient({ event }: EventPageClientProps) {
 
   const formatDate = (date: Date) => {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
-
 
   // NG日カウントをメモ化して最適化 - 他の人のNG日 + 自分のリアルタイム選択
   const ngCountsByDate = useMemo(() => {
     const counts: Record<string, number> = {};
-    
+
     // 他の人のNG日をカウント
     Object.entries(event.participants).forEach(([participantId, participant]) => {
       if (participantId !== userId) {
-        participant.ng_dates.forEach(date => {
+        participant.ng_dates.forEach((date) => {
           counts[date] = (counts[date] || 0) + 1;
         });
       }
     });
-    
+
     // 自分の現在の選択をカウントに追加
     if (userId) {
-      selectedDates.forEach(date => {
+      selectedDates.forEach((date) => {
         counts[date] = (counts[date] || 0) + 1;
       });
     }
-    
+
     return counts;
   }, [event.participants, selectedDates, userId]);
 
@@ -159,7 +152,6 @@ export default function EventPageClient({ event }: EventPageClientProps) {
       alert(`コピーに失敗しました。URL: ${url}`);
     }
   };
-
 
   const renderCalendar = () => {
     const days = getDaysInMonth(currentMonth);
@@ -293,7 +285,12 @@ export default function EventPageClient({ event }: EventPageClientProps) {
             <div className="flex items-center gap-1 text-red-500">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <title>保存エラー</title>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
               <span>{saveError}</span>
             </div>
@@ -319,7 +316,6 @@ export default function EventPageClient({ event }: EventPageClientProps) {
           </h1>
           <p className="text-gray-600">参加できない日をタップしてください</p>
         </div>
-
 
         {/* Month Tabs */}
         <div className="flex gap-2 mb-4">
@@ -349,7 +345,9 @@ export default function EventPageClient({ event }: EventPageClientProps) {
         <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
           <h2 className="text-lg font-bold text-gray-800 mb-4">集計</h2>
           <div className="text-sm text-gray-600">
-            <p>現在 <span className="font-bold text-gray-800">{Object.keys(event.participants).length}名</span> が参加中</p>
+            <p>
+              現在 <span className="font-bold text-gray-800">{Object.keys(event.participants).length}名</span> が参加中
+            </p>
             <p className="mt-2 text-xs text-gray-500">カレンダーの数字は、その日にNGな人数を表示しています</p>
           </div>
         </div>
