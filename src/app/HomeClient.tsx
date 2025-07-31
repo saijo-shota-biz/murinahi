@@ -5,6 +5,7 @@ import { createEvent } from "@/app/actions";
 
 export default function HomeClient() {
   const [url, setUrl] = useState("");
+  const [eventTitle, setEventTitle] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [justCopied, setJustCopied] = useState(false);
 
@@ -12,10 +13,11 @@ export default function HomeClient() {
     return `${window.location.origin}/event/${eventId}`;
   };
 
-  const handleClickTest = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsCreating(true);
     try {
-      const eventId = await createEvent();
+      const eventId = await createEvent(eventTitle);
       const url = genUrl(eventId);
       setUrl(url);
       await copyToClipboard(url);
@@ -68,46 +70,55 @@ export default function HomeClient() {
 
           {/* Main CTA */}
           {!url ? (
-            <button
-              type="button"
-              onClick={handleClickTest}
-              disabled={isCreating}
-              className="group relative inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold text-white transition-all duration-200 bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed animate-pulse-slow"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                {isCreating ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <title>読み込み中</title>
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                        fill="none"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    作成中...
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <title>イベント作成</title>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    イベントを作る
-                  </>
-                )}
-              </span>
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-            </button>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input
+                type="text"
+                value={eventTitle}
+                onChange={(e) => setEventTitle(e.target.value)}
+                placeholder="イベント名（例：新年会、旅行計画）"
+                maxLength={50}
+                className="w-full px-4 py-3 text-base sm:text-lg text-gray-800 bg-white/80 backdrop-blur-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:border-red-400 focus:ring-2 focus:ring-red-200 transition-all duration-200"
+              />
+              <button
+                type="submit"
+                disabled={isCreating}
+                className="group relative inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold text-white transition-all duration-200 bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed animate-pulse-slow"
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  {isCreating ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <title>読み込み中</title>
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      作成中...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <title>イベント作成</title>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      イベントを作る
+                    </>
+                  )}
+                </span>
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+              </button>
+            </form>
           ) : (
             <div className="animate-fade-in">
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-4 sm:p-6 border border-gray-100">

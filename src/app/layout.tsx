@@ -15,9 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: {
     default: "ムリな日カレンダー | 無料の日程調整ツール - 飲み会・イベントの日程調整を最速で",
-    template: "%s | ムリな日カレンダー"
+    template: "%s | ムリな日カレンダー",
   },
-  description: "友達との飲み会や遊びの日程調整が一瞬で完了！参加できない日を選ぶだけの新しい日程調整ツール。LINEグループで簡単共有。登録不要・完全無料。調整さんより簡単。",
+  description:
+    "友達との飲み会や遊びの日程調整が一瞬で完了！参加できない日を選ぶだけの新しい日程調整ツール。LINEグループで簡単共有。登録不要・完全無料。調整さんより簡単。",
   keywords: [
     "日程調整",
     "日程調整ツール",
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     "カレンダー共有",
     "LINE 日程調整",
     "友達 予定合わせ",
-    "グループ 日程調整"
+    "グループ 日程調整",
   ],
   authors: [{ name: "ムリな日カレンダー" }],
   creator: "ムリな日カレンダー",
@@ -53,7 +54,7 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         alt: "ムリな日カレンダー - 新しい日程調整の形",
-      }
+      },
     ],
     locale: "ja_JP",
     type: "website",
@@ -80,22 +81,22 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
     ],
-    shortcut: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
-  manifest: '/site.webmanifest',
+  manifest: "/site.webmanifest",
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
-    title: 'ムリな日カレンダー',
+    statusBarStyle: "default",
+    title: "ムリな日カレンダー",
   },
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ef4444' },
-    { media: '(prefers-color-scheme: dark)', color: '#ef4444' },
+    { media: "(prefers-color-scheme: light)", color: "#ef4444" },
+    { media: "(prefers-color-scheme: dark)", color: "#ef4444" },
   ],
 };
 

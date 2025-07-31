@@ -11,22 +11,28 @@ interface EventPageProps {
 
 export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
   const { id } = await params;
-  
+
+  // イベントデータを取得してタイトルを使用
+  const event = await redis.get<Event>(`event:${id}`);
+  const eventTitle = event?.title || `イベント ${id}`;
+
   return {
-    title: `イベント ${id} の日程調整`,
+    title: `${eventTitle} の日程調整`,
     description: "参加できない日を選んで、みんなの都合の良い日を見つけよう。ムリな日カレンダーで簡単日程調整。",
     robots: {
       index: false,
       follow: true,
     },
     openGraph: {
-      title: `イベント ${id} | ムリな日カレンダー`,
+      title: `${eventTitle} | ムリな日カレンダー`,
       description: "参加できない日を選んで、みんなの都合の良い日を見つけよう。",
-      images: [{
-        url: `/api/og?title=イベント ${id}&subtitle=日程調整中`,
-        width: 1200,
-        height: 630,
-      }],
+      images: [
+        {
+          url: `/api/og?title=${encodeURIComponent(eventTitle)}&subtitle=日程調整中`,
+          width: 1200,
+          height: 630,
+        },
+      ],
     },
   };
 }
