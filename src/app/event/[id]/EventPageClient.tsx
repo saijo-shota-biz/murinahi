@@ -311,11 +311,9 @@ export default function EventPageClient({ event }: EventPageClientProps) {
         {/* Header */}
         <div className="text-center mb-8">
           {event.title && <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">{event.title}</h1>}
-          <h2
-            className={`${event.title ? "text-xl md:text-2xl" : "text-3xl md:text-4xl"} font-black text-gray-800 mb-2`}
-          >
-            参加できない日を選択してください
-          </h2>
+          <p className="text-lg md:text-xl text-gray-600 mb-2">
+            <span className="bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent font-bold">参加できない日</span>をタップしてください
+          </p>
         </div>
 
         {/* Month Tabs */}
