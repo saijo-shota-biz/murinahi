@@ -6,11 +6,12 @@ import type { Event } from "./model/Event";
 const DAYS = 24 * 60 * 60;
 const redis = Redis.fromEnv();
 
-export async function createEvent() {
+export async function createEvent(title?: string) {
   const eventId = Math.random().toString(36).substring(2, 8);
 
-  const event = {
+  const event: Event = {
     id: eventId,
+    title: title?.trim() || undefined,
     participants: {},
     createdAt: new Date().toISOString(),
   };

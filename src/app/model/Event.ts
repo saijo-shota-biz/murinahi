@@ -1,5 +1,6 @@
 export interface Event {
   id: string;
+  title?: string;
   participants: Record<
     string,
     {
