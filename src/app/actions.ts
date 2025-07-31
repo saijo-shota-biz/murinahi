@@ -4,6 +4,7 @@ import { Redis } from "@upstash/redis";
 import type { Event } from "./model/Event";
 
 const DAYS = 24 * 60 * 60;
+const EVENT_TTL_DAYS = 30;
 const redis = Redis.fromEnv();
 
 export async function createEvent(title?: string) {
@@ -16,7 +17,7 @@ export async function createEvent(title?: string) {
     createdAt: new Date().toISOString(),
   };
 
-  await redis.setex(`event:${eventId}`, 30 * DAYS, event);
+  await redis.setex(`event:${eventId}`, EVENT_TTL_DAYS * DAYS, event);
 
   return eventId;
 }
@@ -36,7 +37,7 @@ export async function updateParticipant(eventId: string, userId: string, ngDates
       event.participants[userId] = { ng_dates: ngDates };
 
       // 保存（TTLをリセット）
-      await redis.setex(`event:${eventId}`, 30 * 24 * 60 * 60, JSON.stringify(event));
+      await redis.setex(`event:${eventId}`, EVENT_TTL_DAYS * DAYS, event);
 
       return { success: true };
     } catch (error) {
