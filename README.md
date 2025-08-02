@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ムリな日カレンダー
 
-## Getting Started
+**参加できない日だけ選ぶ、逆転の発想で最速調整**
 
-First, run the development server:
+友達との飲み会や遊びの日程調整が一瞬で完了！参加できない日を選ぶだけの新しい日程調整ツールです。
+
+🔗 **Live Demo**: [https://murinahi.vercel.app](https://murinahi.vercel.app)
+
+## ✨ 特徴
+
+- **🚀 超高速** - 参加できない日だけ選ぶから、調整が一瞬で完了
+- **📱 かんたん操作** - ムリな日をタップするだけ。難しい設定は一切なし
+- **👥 登録不要** - アカウント作成なし。URLを共有するだけで即スタート
+- **📊 リアルタイム集計** - 参加者の選択状況をリアルタイムで確認
+- **🔗 URL共有** - 生成されたURLをLINEやメールで簡単共有
+
+## 🛠️ 技術スタック
+
+- **Frontend**: Next.js 15 (App Router)
+- **Styling**: Tailwind CSS
+- **Database**: Upstash Redis
+- **Deployment**: Vercel
+- **Language**: TypeScript
+
+## 🚀 開発環境のセットアップ
+
+### 必要な環境変数
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+UPSTASH_REDIS_REST_URL=your_redis_url
+UPSTASH_REDIS_REST_TOKEN=your_redis_token
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 開発サーバーの起動
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# 依存関係のインストール
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# 開発サーバーの起動
+npm run dev
+```
 
-## Learn More
+ブラウザで [http://localhost:3000](http://localhost:3000) を開いて確認してください。
 
-To learn more about Next.js, take a look at the following resources:
+### その他のコマンド
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# ビルド
+npm run build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# 本番サーバーの起動
+npm start
 
-## Deploy on Vercel
+# リンター
+npm run lint
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# フォーマッター
+npm run format
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📝 使い方
+
+1. **イベント作成**: ホームページでイベント名を入力して「イベントを作る」ボタンをクリック
+2. **URL共有**: 生成されたURLをLINEやメールで参加者に共有
+3. **日程選択**: 各参加者が参加できない日をカレンダーでタップ
+4. **集計確認**: リアルタイムで全員の選択状況を確認し、最適な日程を決定
+
+## 🏗️ プロジェクト構成
+
+```
+src/
+├── app/
+│   ├── actions.ts          # Server Actions
+│   ├── layout.tsx          # ルートレイアウト
+│   ├── page.tsx            # ホームページ
+│   ├── HomeClient.tsx      # ホームページクライアント
+│   ├── model/
+│   │   └── Event.ts        # データモデル
+│   ├── event/[id]/
+│   │   ├── page.tsx        # イベントページ
+│   │   └── EventPageClient.tsx
+│   ├── api/
+│   │   └── og/route.tsx    # OGP画像生成
+│   ├── sitemap.ts          # サイトマップ
+│   └── robots.ts           # robots.txt
+└── public/                 # 静的ファイル
+```
+
+## 🤝 コントリビューション
+
+1. このリポジトリをフォーク
+2. 機能ブランチを作成 (`git checkout -b feature/amazing-feature`)
+3. 変更をコミット (`git commit -m 'Add amazing feature'`)
+4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
+5. プルリクエストを作成
+
+## 📄 ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。
+
+## 🙏 謝辞
+
+- [Next.js](https://nextjs.org/) - Reactフレームワーク
+- [Tailwind CSS](https://tailwindcss.com/) - CSSフレームワーク
+- [Upstash](https://upstash.com/) - サーバーレスRedis
+- [Vercel](https://vercel.com/) - デプロイメントプラットフォーム
