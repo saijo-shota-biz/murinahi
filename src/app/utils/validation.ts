@@ -31,12 +31,8 @@ export function isValidDateFormat(date: string): boolean {
   // 有効な日付かチェック
   const [year, month, day] = date.split("-").map(Number);
   const dateObj = new Date(year, month - 1, day);
-  
-  return (
-    dateObj.getFullYear() === year &&
-    dateObj.getMonth() === month - 1 &&
-    dateObj.getDate() === day
-  );
+
+  return dateObj.getFullYear() === year && dateObj.getMonth() === month - 1 && dateObj.getDate() === day;
 }
 
 /**
@@ -45,16 +41,16 @@ export function isValidDateFormat(date: string): boolean {
 export function validateEventTitle(title: string | undefined): string | undefined {
   // undefined または空文字列は許可
   if (title === undefined || title === "") return undefined;
-  
+
   if (typeof title !== "string") {
     throw new Error("タイトルは文字列である必要があります");
   }
 
   const trimmed = title.trim();
-  
+
   // 空白のみの場合はundefinedを返す
   if (trimmed === "") return undefined;
-  
+
   if (trimmed.length > MAX_TITLE_LENGTH) {
     throw new Error(`タイトルは${MAX_TITLE_LENGTH}文字以内で入力してください`);
   }

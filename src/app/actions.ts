@@ -12,7 +12,7 @@ export async function createEvent(title?: string) {
   try {
     // タイトルのバリデーション
     const validatedTitle = validateEventTitle(title);
-    
+
     const eventId = Math.random().toString(36).substring(2, 8);
 
     const event: Event = {
