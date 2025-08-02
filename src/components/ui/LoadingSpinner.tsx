@@ -11,7 +11,7 @@ export function LoadingSpinner({ size = "md", className = "" }: LoadingSpinnerPr
   };
 
   return (
-    <svg className={`animate-spin ${sizeClasses[size]} ${className}`} viewBox="0 0 24 24">
+    <svg className={`animate-spin ${sizeClasses[size]} ${className}`.trim()} viewBox="0 0 24 24">
       <title>読み込み中</title>
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
       <path
