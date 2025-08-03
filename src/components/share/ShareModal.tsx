@@ -75,7 +75,7 @@ ${url}
         <h3 className="text-lg font-semibold mb-4">ムリな日カレンダーをシェア</h3>
 
         <div className="space-y-3">
-          {navigator.share && (
+          {typeof navigator !== 'undefined' && 'share' in navigator && (
             <Button onClick={handleWebShare} variant="secondary" className="w-full justify-start">
               📱 システムのシェア機能
             </Button>
