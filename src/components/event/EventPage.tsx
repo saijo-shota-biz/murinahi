@@ -45,7 +45,7 @@ export function EventPage({ event }: EventPageProps) {
 
         <ShareSection />
 
-        <div className="mt-6 flex flex-wrap gap-4 justify-center">
+        <div className="mt-6 flex flex-col gap-3 items-center">
           <TwitterShareButton url={`https://murinahi.com/event/${event.id}`} />
           <CopyShareButton url={`https://murinahi.com/event/${event.id}`} />
         </div>

@@ -17,13 +17,13 @@ describe("CopyShareButton", () => {
 
   it("should render with default props", () => {
     render(<CopyShareButton />);
-    const button = screen.getByRole("button", { name: /テキストをコピー/i });
+    const button = screen.getByRole("button", { name: /ムリな日カレンダーの紹介文をコピー/i });
     expect(button).toBeInTheDocument();
   });
 
   it("should copy share text to clipboard when clicked", async () => {
     render(<CopyShareButton />);
-    const button = screen.getByRole("button", { name: /テキストをコピー/i });
+    const button = screen.getByRole("button", { name: /ムリな日カレンダーの紹介文をコピー/i });
 
     fireEvent.click(button);
 
@@ -34,7 +34,7 @@ describe("CopyShareButton", () => {
 
   it("should show copied message after copying", async () => {
     render(<CopyShareButton />);
-    const button = screen.getByRole("button", { name: /テキストをコピー/i });
+    const button = screen.getByRole("button", { name: /ムリな日カレンダーの紹介文をコピー/i });
 
     fireEvent.click(button);
 
@@ -47,7 +47,7 @@ describe("CopyShareButton", () => {
     const customUrl = "https://example.com/event/123";
     
     render(<CopyShareButton url={customUrl} />);
-    const button = screen.getByRole("button", { name: /テキストをコピー/i });
+    const button = screen.getByRole("button", { name: /ムリな日カレンダーの紹介文をコピー/i });
 
     fireEvent.click(button);
 
@@ -60,7 +60,7 @@ describe("CopyShareButton", () => {
 
   it("should apply variant and size props", () => {
     render(<CopyShareButton variant="primary" size="lg" />);
-    const button = screen.getByRole("button", { name: /テキストをコピー/i });
+    const button = screen.getByRole("button", { name: /ムリな日カレンダーの紹介文をコピー/i });
 
     expect(button).toHaveClass("bg-gradient-to-r", "from-red-500", "to-pink-500");
     expect(button).toHaveClass("px-6", "py-3", "text-lg");
@@ -68,7 +68,7 @@ describe("CopyShareButton", () => {
 
   it("should apply custom className", () => {
     render(<CopyShareButton className="custom-class" />);
-    const button = screen.getByRole("button", { name: /テキストをコピー/i });
+    const button = screen.getByRole("button", { name: /ムリな日カレンダーの紹介文をコピー/i });
 
     expect(button).toHaveClass("custom-class");
   });

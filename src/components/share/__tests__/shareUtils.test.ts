@@ -9,7 +9,7 @@ describe("shareUtils", () => {
       expect(result).toContain("ムリな日カレンダー使ってみた！");
       expect(result).toContain("日程調整がめっちゃ楽になる😊");
       expect(result).toContain("https://murinahi.com");
-      expect(result).toContain("#ムリな日カレンダー #日程調整");
+      expect(result).toContain("#ムリな日 #日程調整 #調整さんへ挑戦");
     });
 
     it("should generate share text with custom URL", () => {
@@ -28,7 +28,7 @@ describe("shareUtils", () => {
       expect(result).toMatch(/調整さんより使いやすくて/);
       expect(result).toMatch(/誰でも簡単に参加できるのがいい✨/);
       expect(result).toMatch(/https:\/\/test\.com/);
-      expect(result).toMatch(/#ムリな日カレンダー #日程調整/);
+      expect(result).toMatch(/#ムリな日 #日程調整 #調整さんへ挑戦/);
     });
   });
 });

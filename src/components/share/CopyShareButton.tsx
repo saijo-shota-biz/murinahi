@@ -51,7 +51,7 @@ export function CopyShareButton({
           fill="currentColor"
         />
       </svg>
-      {copied ? "コピーしました！" : "テキストをコピー"}
+      {copied ? "コピーしました！" : "ムリな日カレンダーの紹介文をコピー"}
     </Button>
   );
 }

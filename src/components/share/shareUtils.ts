@@ -7,5 +7,5 @@ export function getShareText(url: string): string {
 
 ${url}
 
-#ムリな日カレンダー #日程調整`;
+#ムリな日 #日程調整 #調整さんへ挑戦`;
 }

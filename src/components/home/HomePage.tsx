@@ -27,7 +27,7 @@ export function HomePage() {
 
           <FeatureGrid />
 
-          <div className="mt-8 flex flex-wrap gap-4 justify-center">
+          <div className="mt-8 flex flex-col gap-3 items-center">
             <TwitterShareButton />
             <CopyShareButton />
           </div>

@@ -43,7 +43,7 @@ export function TwitterShareButton({
           fill="currentColor"
         />
       </svg>
-      Xでシェア
+      ムリな日カレンダーをXでシェア
     </Button>
   );
 }
