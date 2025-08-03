@@ -4,11 +4,11 @@ import { getShareText } from "../shareUtils";
 describe("shareUtils", () => {
   describe("getShareText", () => {
     it("should generate share text with default URL", () => {
-      const result = getShareText("https://murinahi.com");
+      const result = getShareText("https://murinahi.vercel.app");
       
       expect(result).toContain("ムリな日カレンダー使ってみた！");
       expect(result).toContain("日程調整がめっちゃ楽になる😊");
-      expect(result).toContain("https://murinahi.com");
+      expect(result).toContain("https://murinahi.vercel.app");
       expect(result).toContain("#ムリな日 #日程調整 #調整さんへ挑戦");
     });
 

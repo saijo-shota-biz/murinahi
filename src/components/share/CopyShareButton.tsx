@@ -12,7 +12,7 @@ interface CopyShareButtonProps {
 }
 
 export function CopyShareButton({
-  url = "https://murinahi.com",
+  url = "https://murinahi.vercel.app",
   variant = "secondary",
   size = "md",
   className = "",

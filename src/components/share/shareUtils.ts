@@ -1,9 +1,8 @@
 export function getShareText(url: string): string {
-  return `ムリな日カレンダー使ってみた！
-日程調整がめっちゃ楽になる😊
+  return `「全員OKな日がない」を解決。
 
-調整さんより使いやすくて
-誰でも簡単に参加できるのがいい✨
+参加できない日だけ選ぶ、逆転の日程調整。
+URLシェアするだけ。登録不要。
 
 ${url}
 
