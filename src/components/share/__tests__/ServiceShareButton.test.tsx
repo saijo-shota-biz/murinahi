@@ -9,8 +9,13 @@ Object.defineProperty(window, "open", {
   writable: true,
 });
 
-// Mock navigator.share
-const mockNavigatorShare = vi.fn(() => Promise.resolve());
+// Mock navigator.clipboard
+const mockClipboardWriteText = vi.fn(() => Promise.resolve());
+Object.assign(navigator, {
+  clipboard: {
+    writeText: mockClipboardWriteText,
+  },
+});
 
 describe("ServiceShareButton", () => {
   beforeEach(() => {
@@ -23,10 +28,7 @@ describe("ServiceShareButton", () => {
     expect(button).toBeInTheDocument();
   });
 
-  it("should open Twitter share when clicked on desktop", () => {
-    // Simulate desktop environment (no navigator.share)
-    delete (navigator as any).share;
-
+  it("should open Twitter share when clicked normally", () => {
     render(<ServiceShareButton />);
     const button = screen.getByRole("button", { name: /ムリな日カレンダーを友達に教える/i });
 
@@ -39,51 +41,33 @@ describe("ServiceShareButton", () => {
     );
   });
 
-  it("should use Web Share API when available on mobile", async () => {
-    // Simulate mobile environment with navigator.share
-    Object.defineProperty(navigator, "share", {
-      value: mockNavigatorShare,
-      configurable: true,
-    });
-
+  it("should copy to clipboard when Alt/Cmd key is pressed", async () => {
     render(<ServiceShareButton />);
     const button = screen.getByRole("button", { name: /ムリな日カレンダーを友達に教える/i });
 
-    fireEvent.click(button);
-
-    // Wait for async operation
-    await vi.waitFor(() => {
-      expect(mockNavigatorShare).toHaveBeenCalled();
-    });
-  });
-
-  it("should handle Web Share API cancellation gracefully", async () => {
-    const mockError = new Error("User cancelled");
-    mockError.name = "AbortError";
-    const mockShare = vi.fn(() => Promise.reject(mockError));
-
-    Object.defineProperty(navigator, "share", {
-      value: mockShare,
-      configurable: true,
-    });
-
-    render(<ServiceShareButton />);
-    const button = screen.getByRole("button", { name: /ムリな日カレンダーを友達に教える/i });
-
-    fireEvent.click(button);
+    // Simulate Alt+Click
+    fireEvent.click(button, { altKey: true });
 
     await vi.waitFor(() => {
-      expect(mockShare).toHaveBeenCalled();
+      expect(mockClipboardWriteText).toHaveBeenCalled();
     });
-
-    // Should not throw or show any error
+    
     expect(mockWindowOpen).not.toHaveBeenCalled();
   });
 
-  it("should accept custom url and title props", () => {
-    const customUrl = "https://example.com/event/123";
+  it("should show copied message after copying", async () => {
+    render(<ServiceShareButton />);
+    const button = screen.getByRole("button", { name: /ムリな日カレンダーを友達に教える/i });
 
-    delete (navigator as any).share;
+    fireEvent.click(button, { metaKey: true });
+
+    await vi.waitFor(() => {
+      expect(screen.getByText("コピーしました！")).toBeInTheDocument();
+    });
+  });
+
+  it("should accept custom url props", () => {
+    const customUrl = "https://example.com/event/123";
 
     render(<ServiceShareButton url={customUrl} />);
     const button = screen.getByRole("button", { name: /ムリな日カレンダーを友達に教える/i });

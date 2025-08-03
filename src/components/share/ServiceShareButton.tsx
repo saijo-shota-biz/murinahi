@@ -1,11 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui";
 import { ShareIcon } from "./ShareIcon";
 
 interface ServiceShareButtonProps {
   url?: string;
-  title?: string;
   variant?: "primary" | "secondary" | "ghost";
   size?: "sm" | "md" | "lg";
   className?: string;
@@ -13,11 +13,11 @@ interface ServiceShareButtonProps {
 
 export function ServiceShareButton({
   url = "https://murinahi.com",
-  title = "ムリな日カレンダー",
   variant = "secondary",
   size = "md",
   className = "",
 }: ServiceShareButtonProps) {
+  const [copied, setCopied] = useState(false);
   const shareText = `ムリな日カレンダー使ってみた！
 日程調整がめっちゃ楽になる😊
 
@@ -28,37 +28,35 @@ ${url}
 
 #ムリな日カレンダー #日程調整`;
 
-  const handleShareClick = async () => {
-    // モバイルでWeb Share APIが使える場合は直接シェア
-    if (typeof navigator !== 'undefined' && 'share' in navigator) {
+  const handleShareClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    // Alt/Optionキーが押されている場合はクリップボードにコピー
+    if (event.altKey || event.metaKey) {
       try {
-        await navigator.share({
-          title,
-          text: shareText,
-          url,
-        });
+        await navigator.clipboard.writeText(shareText);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
       } catch (err) {
-        // ユーザーがキャンセルした場合は何もしない
-        if (err instanceof Error && err.name !== 'AbortError') {
-          console.error("Web Share failed:", err);
-        }
+        console.error("Failed to copy:", err);
       }
     } else {
-      // デスクトップではTwitter/Xシェアを直接開く
+      // 通常はTwitter/Xシェアを開く
       const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
       window.open(twitterUrl, "_blank", "noopener,noreferrer");
     }
   };
 
   return (
-    <Button
-      onClick={handleShareClick}
-      variant={variant}
-      size={size}
-      className={`${className}`}
-    >
-      <ShareIcon className="mr-2" />
-      ムリな日カレンダーを友達に教える
-    </Button>
+    <>
+      <Button
+        onClick={handleShareClick}
+        variant={variant}
+        size={size}
+        className={`${className}`}
+        title="クリック: Twitterでシェア | Alt/Cmd+クリック: テキストをコピー"
+      >
+        <ShareIcon className="mr-2" />
+        {copied ? "コピーしました！" : "ムリな日カレンダーを友達に教える"}
+      </Button>
+    </>
   );
 }
