@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnimatedBackground, GlobalStyles } from "@/components/common";
 import { Footer } from "@/components/layout";
+import { ServiceShareButton } from "@/components/share";
 import { HeroSection } from "./HeroSection";
 import { Tagline } from "./Tagline";
 import { EventForm } from "./EventForm";
@@ -25,6 +26,10 @@ export function HomePage() {
           {!url ? <EventForm onEventCreated={setUrl} /> : <EventUrlDisplay url={url} />}
 
           <FeatureGrid />
+
+          <div className="mt-8">
+            <ServiceShareButton />
+          </div>
         </div>
 
         <Footer />

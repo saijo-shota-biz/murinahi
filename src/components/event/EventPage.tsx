@@ -8,6 +8,7 @@ import { MonthTabs } from "./MonthTabs";
 import { Calendar } from "./Calendar";
 import { EventSummary } from "./EventSummary";
 import { ShareSection } from "./ShareSection";
+import { ServiceShareButton } from "@/components/share";
 import { useEventState } from "@/hooks/useEventState";
 
 interface EventPageProps {
@@ -43,6 +44,10 @@ export function EventPage({ event }: EventPageProps) {
         <EventSummary event={event} />
 
         <ShareSection />
+
+        <div className="mt-6 text-center">
+          <ServiceShareButton url={`https://murinahi.com/event/${event.id}`} />
+        </div>
       </div>
     </div>
   );
