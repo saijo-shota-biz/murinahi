@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AnimatedBackground, GlobalStyles } from "@/components/common";
 import { Footer } from "@/components/layout";
-import { ServiceShareButton } from "@/components/share";
+import { TwitterShareButton, CopyShareButton } from "@/components/share";
 import { HeroSection } from "./HeroSection";
 import { Tagline } from "./Tagline";
 import { EventForm } from "./EventForm";
@@ -27,8 +27,9 @@ export function HomePage() {
 
           <FeatureGrid />
 
-          <div className="mt-8">
-            <ServiceShareButton />
+          <div className="mt-8 flex flex-wrap gap-4 justify-center">
+            <TwitterShareButton />
+            <CopyShareButton />
           </div>
         </div>
 

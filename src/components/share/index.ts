@@ -1,2 +1,3 @@
-export { ServiceShareButton } from "./ServiceShareButton";
+export { TwitterShareButton } from "./TwitterShareButton";
+export { CopyShareButton } from "./CopyShareButton";
 export { ShareIcon } from "./ShareIcon";
