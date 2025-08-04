@@ -31,12 +31,7 @@ export function CopyShareButton({
   };
 
   return (
-    <Button
-      onClick={handleClick}
-      variant={variant}
-      size={size}
-      className={className}
-    >
+    <Button onClick={handleClick} variant={variant} size={size} className={className}>
       <div className="flex items-center gap-2">
         <div className="p-1 bg-gray-100 rounded-full">
           {copied ? (
@@ -72,9 +67,7 @@ export function CopyShareButton({
             </svg>
           )}
         </div>
-        <span className="font-medium">
-          {copied ? "コピーしました！" : "紹介文をコピー"}
-        </span>
+        <span className="font-medium">{copied ? "コピーしました！" : "紹介文をコピー"}</span>
       </div>
     </Button>
   );

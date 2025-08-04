@@ -16,13 +16,13 @@ describe("TwitterShareButton", () => {
 
   it("should render with default props", () => {
     render(<TwitterShareButton />);
-    const button = screen.getByRole("button", { name: /ムリな日カレンダーをXでシェア/i });
+    const button = screen.getByRole("button", { name: /Xでシェア/i });
     expect(button).toBeInTheDocument();
   });
 
   it("should open Twitter share when clicked", () => {
     render(<TwitterShareButton />);
-    const button = screen.getByRole("button", { name: /ムリな日カレンダーをXでシェア/i });
+    const button = screen.getByRole("button", { name: /Xでシェア/i });
 
     fireEvent.click(button);
 
@@ -35,9 +35,9 @@ describe("TwitterShareButton", () => {
 
   it("should include custom URL in tweet", () => {
     const customUrl = "https://example.com/event/123";
-    
+
     render(<TwitterShareButton url={customUrl} />);
-    const button = screen.getByRole("button", { name: /ムリな日カレンダーをXでシェア/i });
+    const button = screen.getByRole("button", { name: /Xでシェア/i });
 
     fireEvent.click(button);
 
@@ -50,7 +50,7 @@ describe("TwitterShareButton", () => {
 
   it("should apply variant and size props", () => {
     render(<TwitterShareButton variant="primary" size="lg" />);
-    const button = screen.getByRole("button", { name: /ムリな日カレンダーをXでシェア/i });
+    const button = screen.getByRole("button", { name: /Xでシェア/i });
 
     expect(button).toHaveClass("bg-gradient-to-r", "from-red-500", "to-pink-500");
     expect(button).toHaveClass("px-6", "py-3", "text-lg");
@@ -58,7 +58,7 @@ describe("TwitterShareButton", () => {
 
   it("should apply custom className", () => {
     render(<TwitterShareButton className="custom-class" />);
-    const button = screen.getByRole("button", { name: /ムリな日カレンダーをXでシェア/i });
+    const button = screen.getByRole("button", { name: /Xでシェア/i });
 
     expect(button).toHaveClass("custom-class");
   });

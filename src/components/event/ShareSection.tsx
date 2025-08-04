@@ -21,9 +21,7 @@ export function ShareSection({ event }: ShareSectionProps) {
     }
   };
 
-  const shareUrl = event 
-    ? `https://murinahi.vercel.app/event/${event.id}` 
-    : "https://murinahi.vercel.app";
+  const shareUrl = event ? `https://murinahi.vercel.app/event/${event.id}` : "https://murinahi.vercel.app";
 
   if (!clipboardSupported) {
     return null;
@@ -50,12 +48,18 @@ export function ShareSection({ event }: ShareSectionProps) {
           {justCopied ? "コピーしました！" : "URLをコピー"}
         </button>
       </div>
-      
+
       <div className="border-t border-gray-200/50 pt-6">
         <div className="text-center mb-6">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-50 to-pink-50 rounded-full mb-3">
             <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              <title>ハートアイコン</title>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
             </svg>
             <span className="text-sm font-medium bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-pink-600">
               気に入っていただけましたか？

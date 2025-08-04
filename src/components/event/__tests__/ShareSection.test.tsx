@@ -108,7 +108,7 @@ describe("ShareSection", () => {
     const { container } = render(<ShareSection />);
 
     const shareContainer = container.firstChild as HTMLElement;
-    expect(shareContainer).toHaveClass("bg-white/80", "backdrop-blur-sm", "rounded-xl", "shadow-lg", "p-4", "mt-6");
+    expect(shareContainer).toHaveClass("bg-white/80", "backdrop-blur-sm", "rounded-xl", "shadow-lg", "p-6", "mt-6");
   });
 
   it("should have proper button styling", () => {

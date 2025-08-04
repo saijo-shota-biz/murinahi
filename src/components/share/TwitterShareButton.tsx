@@ -23,12 +23,7 @@ export function TwitterShareButton({
   };
 
   return (
-    <Button
-      onClick={handleClick}
-      variant={variant}
-      size={size}
-      className={className}
-    >
+    <Button onClick={handleClick} variant={variant} size={size} className={className}>
       <div className="flex items-center gap-2">
         <div className="p-1 bg-white/20 rounded-full">
           <svg
