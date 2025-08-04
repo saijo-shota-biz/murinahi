@@ -27,9 +27,24 @@ export function HomePage() {
 
           <FeatureGrid />
 
-          <div className="mt-8 flex flex-col gap-3 items-center">
-            <TwitterShareButton />
-            <CopyShareButton />
+          <div className="mt-16 bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-8 animate-fade-in-up animation-delay-700">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-50 to-pink-50 rounded-full mb-3">
+                <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                <span className="text-sm font-medium bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-pink-600">
+                  気に入っていただけましたか？
+                </span>
+              </div>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                ムリな日カレンダーをお友達にもシェアしていただけると嬉しいです✨
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+              <TwitterShareButton variant="primary" />
+              <CopyShareButton variant="secondary" />
+            </div>
           </div>
         </div>
 

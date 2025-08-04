@@ -8,7 +8,6 @@ import { MonthTabs } from "./MonthTabs";
 import { Calendar } from "./Calendar";
 import { EventSummary } from "./EventSummary";
 import { ShareSection } from "./ShareSection";
-import { TwitterShareButton, CopyShareButton } from "@/components/share";
 import { useEventState } from "@/hooks/useEventState";
 
 interface EventPageProps {
@@ -43,12 +42,7 @@ export function EventPage({ event }: EventPageProps) {
 
         <EventSummary event={event} />
 
-        <ShareSection />
-
-        <div className="mt-6 flex flex-col gap-3 items-center">
-          <TwitterShareButton url={`https://murinahi.vercel.app/event/${event.id}`} />
-          <CopyShareButton url={`https://murinahi.vercel.app/event/${event.id}`} />
-        </div>
+        <ShareSection event={event} />
       </div>
     </div>
   );
