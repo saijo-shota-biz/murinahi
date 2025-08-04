@@ -42,7 +42,7 @@ export function EventPage({ event }: EventPageProps) {
 
         <EventSummary event={event} />
 
-        <ShareSection />
+        <ShareSection event={event} />
       </div>
     </div>
   );
