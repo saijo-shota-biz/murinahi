@@ -42,7 +42,7 @@ export function useEventState(event: Event) {
       if (event.participants[id]) {
         setSelectedDates(new Set(event.participants[id].ng_dates));
         if (event.participants[id].name) {
-          setParticipantName(event.participants[id].name);
+          setParticipantName(event.participants[id].name || "");
         }
       }
     } catch (error) {
