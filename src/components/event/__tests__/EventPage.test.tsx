@@ -8,10 +8,12 @@ vi.mock("@/hooks/useEventState", () => ({
   useEventState: vi.fn(() => ({
     userId: "test-user-id",
     selectedDates: new Set(["2024-01-15"]),
+    participantName: "",
     isSaving: false,
     showSaveSuccess: false,
     saveError: null,
     handleDateClick: vi.fn(),
+    handleNameChange: vi.fn(),
     getNGCountForDate: vi.fn(() => 0),
   })),
 }));

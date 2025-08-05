@@ -2,7 +2,13 @@
 
 import { Redis } from "@upstash/redis";
 import type { Event } from "./model/Event";
-import { validateEventTitle, validateEventId, validateUserId, validateNgDates } from "./utils/validation";
+import {
+  validateEventTitle,
+  validateEventId,
+  validateUserId,
+  validateNgDates,
+  validateParticipantName,
+} from "./utils/validation";
 
 const DAYS = 24 * 60 * 60;
 const EVENT_TTL_DAYS = 30;
@@ -33,7 +39,7 @@ export async function createEvent(title?: string) {
   }
 }
 
-export async function updateParticipant(eventId: string, userId: string, ngDates: string[]) {
+export async function updateParticipant(eventId: string, userId: string, ngDates: string[], name?: string) {
   "use server";
 
   try {
@@ -41,6 +47,7 @@ export async function updateParticipant(eventId: string, userId: string, ngDates
     validateEventId(eventId);
     validateUserId(userId);
     validateNgDates(ngDates);
+    const validatedName = validateParticipantName(name);
 
     const redis = Redis.fromEnv();
 
@@ -51,7 +58,10 @@ export async function updateParticipant(eventId: string, userId: string, ngDates
         if (!event) throw new Error("イベントが見つかりません");
 
         // 参加者データを更新
-        event.participants[userId] = { ng_dates: ngDates };
+        event.participants[userId] = {
+          ng_dates: ngDates,
+          name: validatedName,
+        };
 
         // 保存（TTLをリセット）
         await redis.setex(`event:${eventId}`, EVENT_TTL_DAYS * DAYS, event);

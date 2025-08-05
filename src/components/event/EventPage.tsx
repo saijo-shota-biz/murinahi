@@ -35,6 +35,8 @@ export function EventPage({ event }: EventPageProps) {
           onDateClick={eventState.handleDateClick}
           getNGCountForDate={eventState.getNGCountForDate}
           userId={eventState.userId}
+          participantName={eventState.participantName}
+          onNameChange={eventState.handleNameChange}
           isSaving={eventState.isSaving}
           showSaveSuccess={eventState.showSaveSuccess}
           saveError={eventState.saveError}
