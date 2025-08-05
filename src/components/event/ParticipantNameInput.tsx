@@ -24,14 +24,6 @@ export function ParticipantNameInput({ value, onChange, disabled }: ParticipantN
     onChange(localValue);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      onChange(localValue);
-      e.currentTarget.blur();
-    }
-  };
-
   return (
     <div className="mb-6">
       <label htmlFor="participant-name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -44,7 +36,6 @@ export function ParticipantNameInput({ value, onChange, disabled }: ParticipantN
         value={localValue}
         onChange={(e) => handleChange(e.target.value)}
         onBlur={handleBlur}
-        onKeyDown={handleKeyDown}
         disabled={disabled}
         placeholder="例: 田中"
         maxLength={20}
