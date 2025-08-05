@@ -10,7 +10,6 @@ interface ParticipantNameInputProps {
 
 export function ParticipantNameInput({ value, onChange, disabled }: ParticipantNameInputProps) {
   const [localValue, setLocalValue] = useState(value || "");
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setLocalValue(value || "");
@@ -18,28 +17,20 @@ export function ParticipantNameInput({ value, onChange, disabled }: ParticipantN
 
   const handleChange = (newValue: string) => {
     setLocalValue(newValue);
-
-    // 既存のタイムアウトをクリア
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    // デバウンス処理（500ms）
-    const newTimeoutId = setTimeout(() => {
-      onChange(newValue);
-    }, 500);
-
-    setTimeoutId(newTimeoutId);
   };
 
-  // コンポーネントのアンマウント時にタイムアウトをクリア
-  useEffect(() => {
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [timeoutId]);
+  const handleBlur = () => {
+    // フォーカスが外れた時に保存
+    onChange(localValue);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      onChange(localValue);
+      e.currentTarget.blur();
+    }
+  };
 
   return (
     <div className="mb-6">
@@ -52,6 +43,8 @@ export function ParticipantNameInput({ value, onChange, disabled }: ParticipantN
         type="text"
         value={localValue}
         onChange={(e) => handleChange(e.target.value)}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
         disabled={disabled}
         placeholder="例: 田中"
         maxLength={20}
