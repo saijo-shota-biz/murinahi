@@ -8,6 +8,5 @@ export async function createEvent(title?: string) {
 }
 
 export async function updateParticipant(eventId: string, userId: string, ngDates: string[], name?: string) {
-  "use server";
   return await updateParticipantService(eventId, userId, ngDates, name);
 }
