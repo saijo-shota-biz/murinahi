@@ -11,16 +11,15 @@ export function EventSummary({ event }: EventSummaryProps) {
   // 参加者リストを生成（名前順ソート、匿名参加者は「ななしさん」として採番）
   const participantsList = useMemo(() => {
     const participants = Object.entries(event.participants);
-    const namedParticipants: Array<{ name: string; ngCount: number }> = [];
-    const anonymousParticipants: Array<{ id: string; ngCount: number; order: number }> = [];
+    const namedParticipants: Array<{ name: string }> = [];
+    const anonymousParticipants: Array<{ id: string; order: number }> = [];
 
     // 名前ありと匿名を分類
     participants.forEach(([id, participant], index) => {
-      const ngCount = participant.ng_dates.length;
       if (participant.name) {
-        namedParticipants.push({ name: participant.name, ngCount });
+        namedParticipants.push({ name: participant.name });
       } else {
-        anonymousParticipants.push({ id, ngCount, order: index });
+        anonymousParticipants.push({ id, order: index });
       }
     });
 
@@ -31,11 +30,9 @@ export function EventSummary({ event }: EventSummaryProps) {
     const result = [
       ...namedParticipants.map((p) => ({
         displayName: p.name.length > 20 ? `${p.name.slice(0, 17)}...` : p.name,
-        ngCount: p.ngCount,
       })),
       ...anonymousParticipants.map((p, index) => ({
         displayName: anonymousParticipants.length === 1 ? "ななしさん" : `ななしさん${index + 1}`,
-        ngCount: p.ngCount,
       })),
     ];
 
@@ -56,12 +53,8 @@ export function EventSummary({ event }: EventSummaryProps) {
             <h3 className="font-semibold text-gray-700 mb-2">参加者一覧</h3>
             <ul className="space-y-1">
               {participantsList.map((participant) => (
-                <li
-                  key={participant.displayName}
-                  className="flex justify-between items-center py-1 px-2 hover:bg-gray-50 rounded"
-                >
+                <li key={participant.displayName} className="py-1 px-2 hover:bg-gray-50 rounded">
                   <span className="text-gray-700">{participant.displayName}</span>
-                  <span className="text-sm text-gray-500">{participant.ngCount}日NG</span>
                 </li>
               ))}
             </ul>

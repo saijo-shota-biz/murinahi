@@ -38,7 +38,7 @@ describe("eventService", () => {
           title: "テストイベント",
           participants: {},
           createdAt: expect.any(String),
-        })
+        }),
       );
     });
 
@@ -55,7 +55,7 @@ describe("eventService", () => {
           id: eventId,
           title: undefined,
           participants: {},
-        })
+        }),
       );
     });
 

@@ -39,12 +39,7 @@ describe("participantService", () => {
       mockRedis.get.mockResolvedValue({ ...mockEvent });
       mockRedis.setex.mockResolvedValue("OK");
 
-      const result = await updateParticipant(
-        "abc123",
-        "user123",
-        ["2024-01-15", "2024-01-16"],
-        "田中太郎"
-      );
+      const result = await updateParticipant("abc123", "user123", ["2024-01-15", "2024-01-16"], "田中太郎");
 
       expect(result).toEqual({ success: true });
       expect(mockRedis.get).toHaveBeenCalledWith("event:abc123");
@@ -58,7 +53,7 @@ describe("participantService", () => {
               name: "田中太郎",
             },
           },
-        })
+        }),
       );
     });
 
@@ -79,7 +74,7 @@ describe("participantService", () => {
               name: undefined,
             },
           },
-        })
+        }),
       );
     });
 
@@ -112,22 +107,20 @@ describe("participantService", () => {
               name: "新規ユーザー",
             },
           },
-        })
+        }),
       );
     });
 
     it("should throw error when event not found", async () => {
       mockRedis.get.mockResolvedValue(null);
 
-      await expect(
-        updateParticipant("nonexistent", "user123", ["2024-01-15"])
-      ).rejects.toThrow("データ更新エラー: イベントが見つかりません");
+      await expect(updateParticipant("nonexistent", "user123", ["2024-01-15"])).rejects.toThrow(
+        "データ更新エラー: イベントが見つかりません",
+      );
     });
 
     it("should retry on Redis failure and succeed", async () => {
-      mockRedis.get
-        .mockRejectedValueOnce(new Error("Connection failed"))
-        .mockResolvedValue({ ...mockEvent });
+      mockRedis.get.mockRejectedValueOnce(new Error("Connection failed")).mockResolvedValue({ ...mockEvent });
       mockRedis.setex.mockResolvedValue("OK");
 
       const result = await updateParticipant("abc123", "user123", ["2024-01-15"]);
@@ -139,9 +132,9 @@ describe("participantService", () => {
     it("should fail after maximum retries", async () => {
       mockRedis.get.mockRejectedValue(new Error("Connection failed"));
 
-      await expect(
-        updateParticipant("abc123", "user123", ["2024-01-15"])
-      ).rejects.toThrow("データ更新エラー: Connection failed");
+      await expect(updateParticipant("abc123", "user123", ["2024-01-15"])).rejects.toThrow(
+        "データ更新エラー: Connection failed",
+      );
 
       expect(mockRedis.get).toHaveBeenCalledTimes(3);
     });
@@ -152,9 +145,9 @@ describe("participantService", () => {
         throw new Error("無効なイベントID");
       });
 
-      await expect(
-        updateParticipant("invalid", "user123", ["2024-01-15"])
-      ).rejects.toThrow("データ更新エラー: 無効なイベントID");
+      await expect(updateParticipant("invalid", "user123", ["2024-01-15"])).rejects.toThrow(
+        "データ更新エラー: 無効なイベントID",
+      );
     });
   });
 });

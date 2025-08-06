@@ -1,11 +1,6 @@
 import { Redis } from "@upstash/redis";
 import type { Event } from "@/types/Event";
-import {
-  validateEventId,
-  validateUserId,
-  validateNgDates,
-  validateParticipantName,
-} from "@/utils/validation";
+import { validateEventId, validateUserId, validateNgDates, validateParticipantName } from "@/utils/validation";
 
 const DAYS = 24 * 60 * 60;
 const EVENT_TTL_DAYS = 30;
@@ -18,7 +13,7 @@ export async function updateParticipant(
   eventId: string,
   userId: string,
   ngDates: string[],
-  name?: string
+  name?: string,
 ): Promise<UpdateParticipantResult> {
   try {
     // バリデーション
