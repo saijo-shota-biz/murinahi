@@ -1,7 +1,7 @@
 import { Redis } from "@upstash/redis";
 import type { Event } from "@/types/Event";
 import type { Metadata } from "next";
-import EventPageClient from "./EventPageClient";
+import { EventPage as EventPageComponent } from "@/components/event";
 
 const redis = Redis.fromEnv();
 
@@ -63,5 +63,5 @@ export default async function EventPage({ params }: EventPageProps) {
     );
   }
 
-  return <EventPageClient event={event} />;
+  return <EventPageComponent event={event} />;
 }
