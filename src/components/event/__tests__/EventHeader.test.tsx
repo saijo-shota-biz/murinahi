@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { EventHeader } from "../EventHeader";
-import type { Event } from "@/app/model/Event";
+import type { Event } from "@/types/Event";
 
 describe("EventHeader", () => {
   const mockEvent: Event = {

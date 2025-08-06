@@ -7,7 +7,7 @@ import {
   validateParticipantName,
   isValidUUID,
   isValidDateFormat,
-} from "../../app/utils/validation";
+} from "../validation";
 
 describe("validation utilities", () => {
   describe("isValidUUID", () => {

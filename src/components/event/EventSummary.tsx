@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { Event } from "@/app/model/Event";
+import type { Event } from "@/types/Event";
 
 interface EventSummaryProps {
   event: Event;

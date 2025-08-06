@@ -1,14 +1,14 @@
 "use server";
 
 import { Redis } from "@upstash/redis";
-import type { Event } from "./model/Event";
+import type { Event } from "@/types/Event";
 import {
   validateEventTitle,
   validateEventId,
   validateUserId,
   validateNgDates,
   validateParticipantName,
-} from "./utils/validation";
+} from "@/utils/validation";
 
 const DAYS = 24 * 60 * 60;
 const EVENT_TTL_DAYS = 30;

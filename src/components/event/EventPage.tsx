@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Event } from "@/app/model/Event";
+import type { Event } from "@/types/Event";
 import { AnimatedBackground, GlobalStyles } from "@/components/common";
 import { EventHeader } from "./EventHeader";
 import { MonthTabs } from "./MonthTabs";

@@ -2,7 +2,7 @@
 export type DateString = `${number}-${number}-${number}`;
 
 // Event関連の型は既存のmodel/Event.tsを使用
-export type { Event } from "@/app/model/Event";
+export type { Event } from "@/types/Event";
 
 // 共通のProps型
 export interface BaseComponentProps {

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { EventPage } from "../EventPage";
-import type { Event } from "@/app/model/Event";
+import type { Event } from "@/types/Event";
 
 // Mock the useEventState hook
 vi.mock("@/hooks/useEventState", () => ({

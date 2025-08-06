@@ -1,5 +1,5 @@
 import { Redis } from "@upstash/redis";
-import type { Event } from "@/app/model/Event";
+import type { Event } from "@/types/Event";
 import type { Metadata } from "next";
 import EventPageClient from "./EventPageClient";
 

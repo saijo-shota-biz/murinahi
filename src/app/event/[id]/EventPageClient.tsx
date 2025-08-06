@@ -1,5 +1,5 @@
 import { EventPage } from "@/components/event";
-import type { Event } from "@/app/model/Event";
+import type { Event } from "@/types/Event";
 
 interface EventPageClientProps {
   event: Event;

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { updateParticipant } from "@/app/actions";
-import type { Event } from "@/app/model/Event";
+import type { Event } from "@/types/Event";
 
 export function useEventState(event: Event) {
   const [userId, setUserId] = useState<string | null>(null);
