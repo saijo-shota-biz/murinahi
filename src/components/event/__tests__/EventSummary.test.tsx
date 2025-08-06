@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { EventSummary } from "../EventSummary";
-import type { Event } from "@/app/model/Event";
+import type { Event } from "@/types/Event";
 
 describe("EventSummary", () => {
   it("should render participant count correctly", () => {

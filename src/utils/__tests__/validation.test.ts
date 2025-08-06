@@ -4,9 +4,10 @@ import {
   validateUserId,
   validateEventTitle,
   validateNgDates,
+  validateParticipantName,
   isValidUUID,
   isValidDateFormat,
-} from "../../app/utils/validation";
+} from "../validation";
 
 describe("validation utilities", () => {
   describe("isValidUUID", () => {
@@ -147,6 +148,46 @@ describe("validation utilities", () => {
     it("should throw error for too many dates", () => {
       const tooManyDates = Array.from({ length: 366 }, (_, i) => `2024-01-${String((i % 31) + 1).padStart(2, "0")}`);
       expect(() => validateNgDates(tooManyDates)).toThrow("選択できる日付は365個までです");
+    });
+  });
+
+  describe("validateParticipantName", () => {
+    it("should return undefined for empty string", () => {
+      expect(validateParticipantName("")).toBe(undefined);
+    });
+
+    it("should return undefined for undefined", () => {
+      expect(validateParticipantName(undefined)).toBe(undefined);
+    });
+
+    it("should return trimmed string for valid name", () => {
+      expect(validateParticipantName("田中太郎")).toBe("田中太郎");
+    });
+
+    it("should trim whitespace and return the name", () => {
+      expect(validateParticipantName("  田中太郎  ")).toBe("田中太郎");
+    });
+
+    it("should return undefined for whitespace only", () => {
+      expect(validateParticipantName("   ")).toBe(undefined);
+    });
+
+    it("should throw error for non-string input", () => {
+      expect(() => validateParticipantName(123 as unknown as string)).toThrow("名前は文字列である必要があります");
+    });
+
+    it("should throw error for names longer than 20 characters", () => {
+      const longName = "あ".repeat(21);
+      expect(() => validateParticipantName(longName)).toThrow("名前は20文字以内で入力してください");
+    });
+
+    it("should accept names exactly 20 characters", () => {
+      const exactlyTwentyChars = "あ".repeat(20);
+      expect(validateParticipantName(exactlyTwentyChars)).toBe(exactlyTwentyChars);
+    });
+
+    it("should handle mixed Japanese and English characters", () => {
+      expect(validateParticipantName("田中Taro")).toBe("田中Taro");
     });
   });
 });

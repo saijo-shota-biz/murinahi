@@ -1,9 +1,6 @@
-import { Redis } from "@upstash/redis";
-import type { Event } from "@/app/model/Event";
 import type { Metadata } from "next";
-import EventPageClient from "./EventPageClient";
-
-const redis = Redis.fromEnv();
+import { EventPage as EventPageComponent } from "@/components/event";
+import { getEvent } from "@/services/eventService";
 
 interface EventPageProps {
   params: Promise<{ id: string }>;
@@ -13,7 +10,7 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
   const { id } = await params;
 
   // イベントデータを取得してタイトルを使用
-  const event = await redis.get<Event>(`event:${id}`);
+  const event = await getEvent(id);
   const eventTitle = event?.title || `イベント ${id}`;
 
   return {
@@ -41,7 +38,7 @@ export default async function EventPage({ params }: EventPageProps) {
   const { id } = await params;
 
   // データ取得
-  const event = await redis.get<Event>(`event:${id}`);
+  const event = await getEvent(id);
 
   if (!event) {
     return (
@@ -63,5 +60,5 @@ export default async function EventPage({ params }: EventPageProps) {
     );
   }
 
-  return <EventPageClient event={event} />;
+  return <EventPageComponent event={event} />;
 }

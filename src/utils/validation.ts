@@ -12,6 +12,7 @@ const DATE_FORMAT_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_TITLE_LENGTH = 50;
 const MAX_NG_DATES = 365; // 1年分
 const MAX_EVENT_ID_LENGTH = 20;
+const MAX_PARTICIPANT_NAME_LENGTH = 20;
 
 /**
  * UUID v4形式の検証
@@ -109,4 +110,27 @@ export function validateNgDates(ngDates: string[]): void {
   if (uniqueDates.size !== ngDates.length) {
     throw new Error("重複した日付が含まれています");
   }
+}
+
+/**
+ * 参加者名の検証
+ */
+export function validateParticipantName(name: string | undefined): string | undefined {
+  // undefined または空文字列は許可（匿名参加）
+  if (name === undefined || name === "") return undefined;
+
+  if (typeof name !== "string") {
+    throw new Error("名前は文字列である必要があります");
+  }
+
+  const trimmed = name.trim();
+
+  // 空白のみの場合はundefinedを返す（匿名参加）
+  if (trimmed === "") return undefined;
+
+  if (trimmed.length > MAX_PARTICIPANT_NAME_LENGTH) {
+    throw new Error(`名前は${MAX_PARTICIPANT_NAME_LENGTH}文字以内で入力してください`);
+  }
+
+  return trimmed;
 }

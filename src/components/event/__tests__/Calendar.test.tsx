@@ -10,6 +10,8 @@ describe("Calendar", () => {
     onDateClick: vi.fn(),
     getNGCountForDate: vi.fn(() => 0),
     userId: "test-user-id",
+    participantName: "",
+    onNameChange: vi.fn(),
     isSaving: false,
     showSaveSuccess: false,
     saveError: null,

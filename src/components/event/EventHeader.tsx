@@ -1,4 +1,4 @@
-import type { Event } from "@/app/model/Event";
+import type { Event } from "@/types/Event";
 
 interface EventHeaderProps {
   event: Event;

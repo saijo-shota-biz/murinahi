@@ -1,17 +1,19 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { EventPage } from "../EventPage";
-import type { Event } from "@/app/model/Event";
+import type { Event } from "@/types/Event";
 
 // Mock the useEventState hook
 vi.mock("@/hooks/useEventState", () => ({
   useEventState: vi.fn(() => ({
     userId: "test-user-id",
     selectedDates: new Set(["2024-01-15"]),
+    participantName: "",
     isSaving: false,
     showSaveSuccess: false,
     saveError: null,
     handleDateClick: vi.fn(),
+    handleNameChange: vi.fn(),
     getNGCountForDate: vi.fn(() => 0),
   })),
 }));

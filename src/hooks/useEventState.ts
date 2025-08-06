@@ -3,11 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { updateParticipant } from "@/app/actions";
-import type { Event } from "@/app/model/Event";
+import type { Event } from "@/types/Event";
 
 export function useEventState(event: Event) {
   const [userId, setUserId] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
+  const [participantName, setParticipantName] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -27,16 +28,29 @@ export function useEventState(event: Event) {
       }
       setUserId(id);
 
-      // 既存の参加者なら選択済み日付を復元
+      // LocalStorageから名前を取得
+      try {
+        const savedName = localStorage.getItem(`userName:${event.id}`);
+        if (savedName) {
+          setParticipantName(savedName);
+        }
+      } catch (error) {
+        console.error("名前の取得エラー:", error);
+      }
+
+      // 既存の参加者なら選択済み日付と名前を復元
       if (event.participants[id]) {
         setSelectedDates(new Set(event.participants[id].ng_dates));
+        if (event.participants[id].name) {
+          setParticipantName(event.participants[id].name || "");
+        }
       }
     } catch (error) {
       console.error("ユーザーID初期化エラー:", error);
       // エラーが発生してもランダムIDを生成して継続
       setUserId(uuidv4());
     }
-  }, [event.participants]);
+  }, [event.participants, event.id]);
 
   const handleDateClick = (date: string) => {
     if (!userId) return;
@@ -50,18 +64,40 @@ export function useEventState(event: Event) {
     setSelectedDates(newSelectedDates);
 
     // 自動保存 - Promiseを適切にハンドリング
-    saveData(Array.from(newSelectedDates)).catch((error) => {
+    saveData(Array.from(newSelectedDates), participantName).catch((error) => {
       console.error("自動保存エラー:", error);
     });
   };
 
-  const saveData = async (dates: string[]) => {
+  const handleNameChange = (name: string) => {
+    setParticipantName(name);
+
+    // LocalStorageに保存
+    try {
+      if (name) {
+        localStorage.setItem(`userName:${event.id}`, name);
+      } else {
+        localStorage.removeItem(`userName:${event.id}`);
+      }
+    } catch (error) {
+      console.error("名前の保存エラー:", error);
+    }
+
+    // 選択済み日付がある場合のみサーバーに保存
+    if (selectedDates.size > 0) {
+      saveData(Array.from(selectedDates), name).catch((error) => {
+        console.error("名前保存エラー:", error);
+      });
+    }
+  };
+
+  const saveData = async (dates: string[], name?: string) => {
     if (!userId) return;
 
     setIsSaving(true);
     setSaveError(null);
     try {
-      await updateParticipant(event.id, userId, dates);
+      await updateParticipant(event.id, userId, dates, name === "" ? undefined : name);
 
       setShowSaveSuccess(true);
       setTimeout(() => setShowSaveSuccess(false), 2000);
@@ -104,10 +140,12 @@ export function useEventState(event: Event) {
   return {
     userId,
     selectedDates,
+    participantName,
     isSaving,
     showSaveSuccess,
     saveError,
     handleDateClick,
+    handleNameChange,
     getNGCountForDate,
   };
 }

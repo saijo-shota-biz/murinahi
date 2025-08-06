@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import HomeClient from "./HomeClient";
+import { HomePage } from "@/components/home";
 
 export const metadata: Metadata = {
   title: "無料の日程調整ツール | ムリな日カレンダー",
@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <HomeClient />;
+  return <HomePage />;
 }
