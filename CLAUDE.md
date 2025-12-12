@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-ムリな日カレンダー (Murinahi Calendar) is a reverse calendar scheduling app where participants select dates they **cannot** attend. Built with Next.js 15.4, React 19, TypeScript, and Upstash Redis.
+ムリな日カレンダー (Murinahi Calendar) is a reverse calendar scheduling app where participants select dates they **cannot** attend. Built with Next.js 16, React 19, TypeScript, and Upstash Redis.
 
 ## Essential Commands
 
