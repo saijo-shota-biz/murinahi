@@ -86,3 +86,10 @@ Required in `.env`:
 - Custom validation functions in `src/utils/validation.ts`
 - Error handling with proper user feedback (Japanese messages)
 - Mobile-first responsive design
+
+### MCP Servers
+Playwright MCP is configured in `.mcp.json` for browser automation and visual testing:
+- Navigate and interact with pages
+- Take accessibility snapshots
+- Fill forms and click elements
+- Verify UI behavior during development
