@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-ムリな日カレンダー (Murinahi Calendar) is a reverse calendar scheduling app where participants select dates they **cannot** attend. Built with Next.js 15, TypeScript, and Upstash Redis.
+ムリな日カレンダー (Murinahi Calendar) is a reverse calendar scheduling app where participants select dates they **cannot** attend. Built with Next.js 15.4, React 19, TypeScript, and Upstash Redis.
 
 ## Essential Commands
 
@@ -19,7 +19,7 @@ npm run lint         # Lint with Biome
 npm run format       # Format with Biome
 
 # Testing
-npm test             # Run tests with Vitest
+npm test             # Run tests with Vitest (watch mode)
 npm run test:ui      # Run tests with UI
 npm run test:run     # Run tests once (CI mode)
 ```
@@ -38,28 +38,37 @@ npm run test:run     # Run tests once (CI mode)
 ### Project Structure
 ```
 src/
-├── app/              # Next.js App Router pages and layouts
-│   ├── actions/      # Server actions (createEvent, updateParticipant)
-│   └── event/[id]/   # Event page with calendar interface
-├── components/       # Feature-based component organization
-│   ├── home/         # Landing page components
-│   ├── event/        # Calendar and participant components
-│   ├── share/        # Share functionality (Twitter, clipboard)
-│   └── ui/           # Reusable UI components
-├── services/         # Business logic layer
-│   ├── eventService.ts      # Event CRUD operations
+├── app/
+│   ├── page.tsx           # Home page
+│   ├── layout.tsx         # Root layout with metadata
+│   ├── actions.ts         # Server actions (createEvent, updateParticipant)
+│   ├── event/[id]/        # Event page with calendar interface
+│   ├── api/og/            # OG image generation endpoint
+│   ├── robots.ts          # SEO robots configuration
+│   └── sitemap.ts         # SEO sitemap generation
+├── components/
+│   ├── common/            # Shared components (AnimatedBackground, GlobalStyles)
+│   ├── event/             # Calendar and participant components
+│   ├── home/              # Landing page components
+│   ├── layout/            # Layout components (Footer)
+│   ├── share/             # Share functionality (Twitter, clipboard)
+│   └── ui/                # Reusable UI components (Button, Input, Card)
+├── services/
+│   ├── eventService.ts    # Event CRUD operations
 │   └── participantService.ts # Participant management
-├── hooks/            # Custom React hooks
-├── utils/            # Helper functions (dates, validation)
-└── types/            # TypeScript type definitions
+├── hooks/                 # Custom React hooks (useClipboard, useEventState)
+├── utils/                 # Helper functions (dateHelpers, validation)
+├── types/                 # TypeScript type definitions
+└── test/                  # Test setup and utilities
 ```
 
 ### Key Technical Decisions
-- **Biome** instead of ESLint/Prettier (configured in biome.json)
+- **Biome** for linting and formatting (line width: 120, double quotes, auto-organize imports)
 - **Upstash Redis** for serverless data persistence
-- **Server Actions** for form handling (no API routes)
+- **Server Actions** for form handling (no API routes except OG images)
 - **Tailwind CSS v4** with PostCSS
 - **Vitest** for testing with React Testing Library
+- **@vercel/og** for dynamic OG image generation
 
 ### Environment Variables
 Required in `.env`:
@@ -67,13 +76,13 @@ Required in `.env`:
 - `UPSTASH_REDIS_REST_TOKEN`
 
 ### Testing Strategy
-- Component tests co-located with components (`*.test.tsx`)
-- Test utilities in `src/test/test-utils.tsx`
+- Tests in `__tests__/` subdirectories within each component folder
+- Test setup in `src/test/setup.ts`
 - Mock Redis client in tests to avoid external dependencies
 
 ### Important Patterns
 - All dates are stored as `YYYY-MM-DD` strings
 - Redis keys: `event:{id}` with 30-day expiration
-- Form validation uses Zod schemas
-- Error handling with proper user feedback
+- Custom validation functions in `src/utils/validation.ts`
+- Error handling with proper user feedback (Japanese messages)
 - Mobile-first responsive design
