@@ -7,6 +7,7 @@ interface CalendarDayProps {
   isPastDate: boolean;
   userId: string | null;
   onDateClick: (date: string) => void;
+  disabled?: boolean;
 }
 
 export function CalendarDay({
@@ -18,8 +19,9 @@ export function CalendarDay({
   isPastDate,
   userId,
   onDateClick,
+  disabled,
 }: CalendarDayProps) {
-  const isDisabled = !userId || isPastDate;
+  const isDisabled = !userId || isPastDate || disabled;
 
   return (
     <button

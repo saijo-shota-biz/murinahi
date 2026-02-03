@@ -21,10 +21,10 @@ describe("EventSummary", () => {
     expect(screen.getByText("集計")).toBeInTheDocument();
     expect(screen.getByText("3名")).toBeInTheDocument();
 
-    // Check the full text content
+    // Check the full text content (includes input progress count)
     expect(
       screen.getByText((_, element) => {
-        return element?.textContent === "現在 3名 が参加中";
+        return element?.textContent === "現在 3名 が参加中（3名が入力中）";
       }),
     ).toBeInTheDocument();
   });
