@@ -34,9 +34,7 @@ export function InputCompletedToggle({ checked, onChange, disabled }: InputCompl
         </button>
         <span className={`text-sm font-medium ${checked ? "text-red-600" : "text-gray-700"}`}>入力できた</span>
       </div>
-      {!checked && (
-        <p className="mt-2 text-xs text-gray-500">こちらをONにしておくと他の参加者に入力が終わったことを伝えられます</p>
-      )}
+      <p className="mt-2 text-xs text-gray-500">こちらをONにしておくと他の参加者に入力が終わったことを伝えられます</p>
     </div>
   );
 }
