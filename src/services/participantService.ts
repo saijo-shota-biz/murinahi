@@ -14,6 +14,7 @@ export async function updateParticipant(
   userId: string,
   ngDates: string[],
   name?: string,
+  inputCompleted?: boolean,
 ): Promise<UpdateParticipantResult> {
   try {
     // バリデーション
@@ -34,6 +35,7 @@ export async function updateParticipant(
         event.participants[userId] = {
           ng_dates: ngDates,
           name: validatedName,
+          inputCompleted: inputCompleted ?? false,
         };
 
         // 保存（TTLをリセット）

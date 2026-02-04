@@ -51,6 +51,7 @@ describe("participantService", () => {
             user123: {
               ng_dates: ["2024-01-15", "2024-01-16"],
               name: "田中太郎",
+              inputCompleted: false,
             },
           },
         }),
@@ -72,6 +73,7 @@ describe("participantService", () => {
             user123: {
               ng_dates: ["2024-01-15"],
               name: undefined,
+              inputCompleted: false,
             },
           },
         }),
@@ -105,6 +107,7 @@ describe("participantService", () => {
             newUser: {
               ng_dates: ["2024-01-15"],
               name: "新規ユーザー",
+              inputCompleted: false,
             },
           },
         }),

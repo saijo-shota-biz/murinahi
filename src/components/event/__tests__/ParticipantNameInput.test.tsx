@@ -84,7 +84,7 @@ describe("ParticipantNameInput", () => {
   });
 
   it("should handle undefined value prop", () => {
-    // @ts-ignore - testing edge case
+    // @ts-expect-error - testing edge case
     render(<ParticipantNameInput onChange={mockOnChange} />);
 
     const input = screen.getByRole("textbox");

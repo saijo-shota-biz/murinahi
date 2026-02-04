@@ -1,6 +1,7 @@
 export interface Participant {
   ng_dates: string[];
   name?: string;
+  inputCompleted?: boolean;
 }
 
 export interface Event {

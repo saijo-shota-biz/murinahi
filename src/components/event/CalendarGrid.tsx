@@ -7,6 +7,7 @@ interface CalendarGridProps {
   onDateClick: (date: string) => void;
   getNGCountForDate: (date: string) => number;
   userId: string | null;
+  disabled?: boolean;
 }
 
 export function CalendarGrid({
@@ -15,6 +16,7 @@ export function CalendarGrid({
   onDateClick,
   getNGCountForDate,
   userId,
+  disabled,
 }: CalendarGridProps) {
   const days = getDaysInMonth(currentMonth);
   const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
@@ -56,6 +58,7 @@ export function CalendarGrid({
             isPastDate={isPastDate}
             userId={userId}
             onDateClick={onDateClick}
+            disabled={disabled}
           />
         );
       })}

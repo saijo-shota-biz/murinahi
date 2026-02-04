@@ -9,11 +9,13 @@ vi.mock("@/hooks/useEventState", () => ({
     userId: "test-user-id",
     selectedDates: new Set(["2024-01-15"]),
     participantName: "",
+    inputCompleted: false,
     isSaving: false,
     showSaveSuccess: false,
     saveError: null,
     handleDateClick: vi.fn(),
     handleNameChange: vi.fn(),
+    handleInputCompletedChange: vi.fn(),
     getNGCountForDate: vi.fn(() => 0),
   })),
 }));
@@ -72,10 +74,10 @@ describe("EventPage", () => {
     expect(screen.getByText("集計")).toBeInTheDocument();
     expect(screen.getByText("2名")).toBeInTheDocument(); // 2 participants
 
-    // Use partial text matching for the compound text
+    // Use partial text matching for the compound text (includes input progress count)
     expect(
       screen.getByText((_content, element) => {
-        return element?.textContent === "現在 2名 が参加中";
+        return element?.textContent === "現在 2名 が参加中（2名が入力中）";
       }),
     ).toBeInTheDocument();
   });

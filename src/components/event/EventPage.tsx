@@ -37,6 +37,8 @@ export function EventPage({ event }: EventPageProps) {
           userId={eventState.userId}
           participantName={eventState.participantName}
           onNameChange={eventState.handleNameChange}
+          inputCompleted={eventState.inputCompleted}
+          onInputCompletedChange={eventState.handleInputCompletedChange}
           isSaving={eventState.isSaving}
           showSaveSuccess={eventState.showSaveSuccess}
           saveError={eventState.saveError}

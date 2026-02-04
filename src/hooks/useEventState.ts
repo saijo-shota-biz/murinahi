@@ -9,6 +9,7 @@ export function useEventState(event: Event) {
   const [userId, setUserId] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
   const [participantName, setParticipantName] = useState<string>("");
+  const [inputCompleted, setInputCompleted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -38,12 +39,13 @@ export function useEventState(event: Event) {
         console.error("名前の取得エラー:", error);
       }
 
-      // 既存の参加者なら選択済み日付と名前を復元
+      // 既存の参加者なら選択済み日付と名前とinputCompletedを復元
       if (event.participants[id]) {
         setSelectedDates(new Set(event.participants[id].ng_dates));
         if (event.participants[id].name) {
           setParticipantName(event.participants[id].name || "");
         }
+        setInputCompleted(event.participants[id].inputCompleted ?? false);
       }
     } catch (error) {
       console.error("ユーザーID初期化エラー:", error);
@@ -53,7 +55,7 @@ export function useEventState(event: Event) {
   }, [event.participants, event.id]);
 
   const handleDateClick = (date: string) => {
-    if (!userId) return;
+    if (!userId || inputCompleted) return;
 
     const newSelectedDates = new Set(selectedDates);
     if (newSelectedDates.has(date)) {
@@ -91,13 +93,20 @@ export function useEventState(event: Event) {
     }
   };
 
-  const saveData = async (dates: string[], name?: string) => {
+  const handleInputCompletedChange = (completed: boolean) => {
+    setInputCompleted(completed);
+    saveData(Array.from(selectedDates), participantName, completed).catch((error) => {
+      console.error("入力完了状態の保存エラー:", error);
+    });
+  };
+
+  const saveData = async (dates: string[], name?: string, completed?: boolean) => {
     if (!userId) return;
 
     setIsSaving(true);
     setSaveError(null);
     try {
-      await updateParticipant(event.id, userId, dates, name === "" ? undefined : name);
+      await updateParticipant(event.id, userId, dates, name === "" ? undefined : name, completed ?? inputCompleted);
 
       setShowSaveSuccess(true);
       setTimeout(() => setShowSaveSuccess(false), 2000);
@@ -141,11 +150,13 @@ export function useEventState(event: Event) {
     userId,
     selectedDates,
     participantName,
+    inputCompleted,
     isSaving,
     showSaveSuccess,
     saveError,
     handleDateClick,
     handleNameChange,
+    handleInputCompletedChange,
     getNGCountForDate,
   };
 }
