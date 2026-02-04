@@ -137,7 +137,7 @@ export function EventForm({ onEventCreated }: EventFormProps) {
         className="w-full"
       />
 
-      <div className="border border-gray-200 rounded-xl p-4 space-y-3">
+      <div className="border border-gray-300 rounded-xl p-4 space-y-3">
         <div className="text-sm font-medium text-gray-600">詳細設定（すべて任意）</div>
 
         <div className="space-y-2">
@@ -149,32 +149,31 @@ export function EventForm({ onEventCreated }: EventFormProps) {
               onChange={(e) => handleStartDateChange(e.target.value)}
               min={getTodayString()}
               max={getMaxDateString()}
-              className="flex-1 px-3 py-2 text-sm text-gray-800 bg-white/80 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-red-400 focus:ring-2 focus:ring-red-200 transition-all duration-200"
+              className="w-0 min-w-0 flex-1 px-2 py-1.5 text-sm text-gray-800 bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200 transition-all duration-200"
             />
-            <span className="text-gray-400 text-sm">〜</span>
+            <span className="text-gray-400 text-sm shrink-0">〜</span>
             <input
               type="date"
               value={endDate}
               onChange={(e) => handleEndDateChange(e.target.value)}
               min={startDate || getTodayString()}
               max={getMaxDateString()}
-              className="flex-1 px-3 py-2 text-sm text-gray-800 bg-white/80 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-red-400 focus:ring-2 focus:ring-red-200 transition-all duration-200"
+              className="w-0 min-w-0 flex-1 px-2 py-1.5 text-sm text-gray-800 bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200 transition-all duration-200"
             />
           </div>
-          {!startDate && !endDate && <p className="text-xs text-gray-400">未設定の場合は制限なし</p>}
           {dateError && <p className="text-xs text-red-500">{dateError}</p>}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {SHORTCUTS.map(({ key, label }) => (
             <button
               key={key}
               type="button"
               onClick={() => handleShortcutClick(key)}
-              className={`flex-1 px-2 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 ${
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 ${
                 activeShortcut === key
                   ? "bg-red-500 text-white border-red-500"
-                  : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+                  : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50 hover:border-gray-400"
               }`}
             >
               {label}
