@@ -1,20 +1,25 @@
 import { Redis } from "@upstash/redis";
 import type { Event } from "@/types/Event";
-import { validateEventTitle } from "@/utils/validation";
+import { validateEventTitle, validateEventDateRange } from "@/utils/validation";
 
 const DAYS = 24 * 60 * 60;
 const EVENT_TTL_DAYS = 30;
 
-export async function createEvent(title?: string): Promise<string> {
+export async function createEvent(title?: string, startDate?: string, endDate?: string): Promise<string> {
   try {
     // タイトルのバリデーション
     const validatedTitle = validateEventTitle(title);
+
+    // 期間のバリデーション
+    const validatedRange = validateEventDateRange(startDate, endDate);
 
     const eventId = Math.random().toString(36).substring(2, 8);
 
     const event: Event = {
       id: eventId,
       title: validatedTitle,
+      startDate: validatedRange.startDate,
+      endDate: validatedRange.endDate,
       participants: {},
       createdAt: new Date().toISOString(),
     };

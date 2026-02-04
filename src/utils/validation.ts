@@ -113,6 +113,54 @@ export function validateNgDates(ngDates: string[]): void {
 }
 
 /**
+ * イベント期間の検証
+ */
+export function validateEventDateRange(
+  startDate: string | undefined,
+  endDate: string | undefined,
+): { startDate?: string; endDate?: string } {
+  // 両方未設定なら制限なし
+  if (!startDate && !endDate) return {};
+
+  // 片方だけ設定されている場合はエラー
+  if (!startDate || !endDate) {
+    throw new Error("開始日と終了日の両方を指定してください");
+  }
+
+  // 日付形式の検証
+  if (!isValidDateFormat(startDate)) {
+    throw new Error("開始日の形式が無効です");
+  }
+  if (!isValidDateFormat(endDate)) {
+    throw new Error("終了日の形式が無効です");
+  }
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // 開始日は今日以降
+  if (start < today) {
+    throw new Error("開始日は今日以降の日付を指定してください");
+  }
+
+  // 終了日は開始日より後
+  if (end <= start) {
+    throw new Error("終了日は開始日より後の日付を指定してください");
+  }
+
+  // 期間上限1年
+  const maxEnd = new Date(start);
+  maxEnd.setFullYear(maxEnd.getFullYear() + 1);
+  if (end > maxEnd) {
+    throw new Error("期間は最大1年間です");
+  }
+
+  return { startDate, endDate };
+}
+
+/**
  * 参加者名の検証
  */
 export function validateParticipantName(name: string | undefined): string | undefined {

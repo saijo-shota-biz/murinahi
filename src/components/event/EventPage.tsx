@@ -42,6 +42,8 @@ export function EventPage({ event }: EventPageProps) {
           isSaving={eventState.isSaving}
           showSaveSuccess={eventState.showSaveSuccess}
           saveError={eventState.saveError}
+          startDate={event.startDate}
+          endDate={event.endDate}
         />
 
         <EventSummary event={event} />

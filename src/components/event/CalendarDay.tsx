@@ -5,6 +5,7 @@ interface CalendarDayProps {
   ngCount: number;
   isToday: boolean;
   isPastDate: boolean;
+  isOutOfRange?: boolean;
   userId: string | null;
   onDateClick: (date: string) => void;
   disabled?: boolean;
@@ -17,11 +18,12 @@ export function CalendarDay({
   ngCount,
   isToday,
   isPastDate,
+  isOutOfRange,
   userId,
   onDateClick,
   disabled,
 }: CalendarDayProps) {
-  const isDisabled = !userId || isPastDate || disabled;
+  const isDisabled = !userId || isPastDate || isOutOfRange || disabled;
 
   return (
     <button

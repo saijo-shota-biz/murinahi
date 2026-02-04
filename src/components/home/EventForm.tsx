@@ -4,32 +4,126 @@ import { useState } from "react";
 import { createEvent } from "@/app/actions";
 import { Button, Input } from "@/components/ui";
 import { useClipboard } from "@/hooks";
+import { formatDate } from "@/utils/dateHelpers";
 
 interface EventFormProps {
   onEventCreated: (url: string) => void;
 }
 
+function addDaysToDate(base: Date, days: number): string {
+  const d = new Date(base);
+  d.setDate(d.getDate() + days);
+  return formatDate(d);
+}
+
+function addMonthsToDate(base: Date, months: number): string {
+  const d = new Date(base);
+  d.setMonth(d.getMonth() + months);
+  return formatDate(d);
+}
+
+function getTodayString(): string {
+  return formatDate(new Date());
+}
+
+function getMaxDateString(): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + 1);
+  return formatDate(d);
+}
+
+type ShortcutKey = "1w" | "2w" | "1m" | "2m";
+
+const SHORTCUTS: { key: ShortcutKey; label: string }[] = [
+  { key: "1w", label: "1週間" },
+  { key: "2w", label: "2週間" },
+  { key: "1m", label: "1ヶ月" },
+  { key: "2m", label: "2ヶ月" },
+];
+
+function getShortcutEndDate(key: ShortcutKey): string {
+  const today = new Date();
+  switch (key) {
+    case "1w":
+      return addDaysToDate(today, 7);
+    case "2w":
+      return addDaysToDate(today, 14);
+    case "1m":
+      return addMonthsToDate(today, 1);
+    case "2m":
+      return addMonthsToDate(today, 2);
+  }
+}
+
+function getActiveShortcut(startDate: string, endDate: string): ShortcutKey | null {
+  const todayStr = getTodayString();
+  if (startDate !== todayStr) return null;
+
+  for (const shortcut of SHORTCUTS) {
+    if (endDate === getShortcutEndDate(shortcut.key)) {
+      return shortcut.key;
+    }
+  }
+  return null;
+}
+
 export function EventForm({ onEventCreated }: EventFormProps) {
   const [eventTitle, setEventTitle] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [dateError, setDateError] = useState<string | null>(null);
   const { copyToClipboard } = useClipboard();
 
   const genUrl = (eventId: string) => {
     return `${window.location.origin}/event/${eventId}`;
   };
 
+  const handleShortcutClick = (key: ShortcutKey) => {
+    setDateError(null);
+    const todayStr = getTodayString();
+    const end = getShortcutEndDate(key);
+
+    // 同じショートカットをもう一度押したらクリア
+    if (startDate === todayStr && endDate === end) {
+      setStartDate("");
+      setEndDate("");
+      return;
+    }
+
+    setStartDate(todayStr);
+    setEndDate(end);
+  };
+
+  const handleStartDateChange = (value: string) => {
+    setDateError(null);
+    setStartDate(value);
+  };
+
+  const handleEndDateChange = (value: string) => {
+    setDateError(null);
+    setEndDate(value);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setDateError(null);
     setIsCreating(true);
     try {
-      const eventId = await createEvent(eventTitle);
+      const eventId = await createEvent(eventTitle, startDate || undefined, endDate || undefined);
       const url = genUrl(eventId);
       onEventCreated(url);
       await copyToClipboard(url);
+    } catch (error) {
+      if (error instanceof Error) {
+        setDateError(error.message);
+      }
     } finally {
       setIsCreating(false);
     }
   };
+
+  const activeShortcut = startDate && endDate ? getActiveShortcut(startDate, endDate) : null;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -42,6 +136,53 @@ export function EventForm({ onEventCreated }: EventFormProps) {
         variant="large"
         className="w-full"
       />
+
+      <div className="border border-gray-200 rounded-xl p-4 space-y-3">
+        <div className="text-sm font-medium text-gray-600">詳細設定（すべて任意）</div>
+
+        <div className="space-y-2">
+          <span className="text-sm text-gray-500">入力可能な日付</span>
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => handleStartDateChange(e.target.value)}
+              min={getTodayString()}
+              max={getMaxDateString()}
+              className="flex-1 px-3 py-2 text-sm text-gray-800 bg-white/80 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-red-400 focus:ring-2 focus:ring-red-200 transition-all duration-200"
+            />
+            <span className="text-gray-400 text-sm">〜</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => handleEndDateChange(e.target.value)}
+              min={startDate || getTodayString()}
+              max={getMaxDateString()}
+              className="flex-1 px-3 py-2 text-sm text-gray-800 bg-white/80 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-red-400 focus:ring-2 focus:ring-red-200 transition-all duration-200"
+            />
+          </div>
+          {!startDate && !endDate && <p className="text-xs text-gray-400">未設定の場合は制限なし</p>}
+          {dateError && <p className="text-xs text-red-500">{dateError}</p>}
+        </div>
+
+        <div className="flex gap-2">
+          {SHORTCUTS.map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => handleShortcutClick(key)}
+              className={`flex-1 px-2 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 ${
+                activeShortcut === key
+                  ? "bg-red-500 text-white border-red-500"
+                  : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <Button
         type="submit"
         loading={isCreating}

@@ -3,8 +3,8 @@
 import { createEvent as createEventService } from "@/services/eventService";
 import { updateParticipant as updateParticipantService } from "@/services/participantService";
 
-export async function createEvent(title?: string) {
-  return await createEventService(title);
+export async function createEvent(title?: string, startDate?: string, endDate?: string) {
+  return await createEventService(title, startDate, endDate);
 }
 
 export async function updateParticipant(

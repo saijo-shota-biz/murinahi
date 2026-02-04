@@ -16,6 +16,7 @@ vi.mock("@upstash/redis", () => ({
 // バリデーション関数のモック
 vi.mock("@/utils/validation", () => ({
   validateEventTitle: vi.fn((title) => title?.trim() || undefined),
+  validateEventDateRange: vi.fn((startDate, endDate) => ({ startDate, endDate })),
 }));
 
 describe("eventService", () => {
