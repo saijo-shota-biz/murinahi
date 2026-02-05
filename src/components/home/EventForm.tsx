@@ -137,11 +137,28 @@ export function EventForm({ onEventCreated }: EventFormProps) {
         className="w-full"
       />
 
-      <div className="border border-gray-300 rounded-xl p-4 space-y-3">
-        <div className="text-sm font-medium text-gray-600">詳細設定（すべて任意）</div>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-gray-500">回答期間（任意）</span>
+          <div className="flex gap-1.5">
+            {SHORTCUTS.map(({ key, label }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => handleShortcutClick(key)}
+                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
+                  activeShortcut === key
+                    ? "bg-red-500 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
 
-        <div className="space-y-2">
-          <span className="text-sm text-gray-500">入力可能な日付</span>
+        {(startDate || endDate) && (
           <div className="flex items-center gap-2">
             <input
               type="date"
@@ -161,25 +178,8 @@ export function EventForm({ onEventCreated }: EventFormProps) {
               className="w-0 min-w-0 flex-1 px-2 py-1.5 text-sm text-gray-800 bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200 transition-all duration-200"
             />
           </div>
-          {dateError && <p className="text-xs text-red-500">{dateError}</p>}
-        </div>
-
-        <div className="flex gap-2 flex-wrap">
-          {SHORTCUTS.map(({ key, label }) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => handleShortcutClick(key)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-200 ${
-                activeShortcut === key
-                  ? "bg-red-500 text-white border-red-500"
-                  : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50 hover:border-gray-400"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        )}
+        {dateError && <p className="text-xs text-red-500">{dateError}</p>}
       </div>
 
       <Button
