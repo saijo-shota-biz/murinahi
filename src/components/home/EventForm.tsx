@@ -124,7 +124,7 @@ export function EventForm({ onEventCreated }: EventFormProps) {
   };
 
   const activeShortcut = startDate && endDate ? getActiveShortcut(startDate, endDate) : null;
-  const hasPartialDateRange = (startDate && !endDate) || (!startDate && endDate);
+  const hasPartialDateRange = Boolean((startDate && !endDate) || (!startDate && endDate));
 
   const dateInputClass =
     "w-0 min-w-0 flex-1 px-2 py-1.5 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200 transition-all duration-200";
