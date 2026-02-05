@@ -124,6 +124,10 @@ export function EventForm({ onEventCreated }: EventFormProps) {
   };
 
   const activeShortcut = startDate && endDate ? getActiveShortcut(startDate, endDate) : null;
+  const hasPartialDateRange = (startDate && !endDate) || (!startDate && endDate);
+
+  const dateInputClass =
+    "w-0 min-w-0 flex-1 px-2 py-1.5 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200 transition-all duration-200";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -138,17 +142,18 @@ export function EventForm({ onEventCreated }: EventFormProps) {
       />
 
       <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-        <div className="text-xs font-medium text-gray-400 uppercase tracking-wide">詳細設定</div>
+        <div className="text-xs font-medium text-gray-400 tracking-wide">詳細設定</div>
 
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <span className="text-sm text-gray-600">回答期間</span>
-            <div className="flex gap-1.5">
+            <div className="flex gap-1.5 flex-wrap">
               {SHORTCUTS.map(({ key, label }) => (
                 <button
                   key={key}
                   type="button"
                   onClick={() => handleShortcutClick(key)}
+                  aria-pressed={activeShortcut === key}
                   className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
                     activeShortcut === key
                       ? "bg-red-500 text-white"
@@ -160,14 +165,15 @@ export function EventForm({ onEventCreated }: EventFormProps) {
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 max-w-md">
             <input
               type="date"
               value={startDate}
               onChange={(e) => handleStartDateChange(e.target.value)}
               min={getTodayString()}
               max={getMaxDateString()}
-              className="w-0 min-w-0 flex-1 px-2 py-1.5 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200 transition-all duration-200"
+              aria-label="開始日"
+              className={dateInputClass}
             />
             <span className="text-gray-400 text-sm shrink-0">〜</span>
             <input
@@ -176,9 +182,13 @@ export function EventForm({ onEventCreated }: EventFormProps) {
               onChange={(e) => handleEndDateChange(e.target.value)}
               min={startDate || getTodayString()}
               max={getMaxDateString()}
-              className="w-0 min-w-0 flex-1 px-2 py-1.5 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200 transition-all duration-200"
+              aria-label="終了日"
+              className={dateInputClass}
             />
           </div>
+          {hasPartialDateRange && (
+            <p className="text-xs text-amber-600">開始日と終了日の両方を入力してください</p>
+          )}
           {dateError && <p className="text-xs text-red-500">{dateError}</p>}
         </div>
       </div>
@@ -186,6 +196,7 @@ export function EventForm({ onEventCreated }: EventFormProps) {
       <Button
         type="submit"
         loading={isCreating}
+        disabled={hasPartialDateRange}
         size="lg"
         className="group relative px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg shadow-xl hover:shadow-2xl transition-all duration-200"
       >
