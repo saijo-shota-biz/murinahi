@@ -27,6 +27,14 @@ function getTomorrowString(): string {
   return formatDate(tomorrow);
 }
 
+function formatDateRange(startDate: string, endDate: string): string {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const startStr = `${start.getMonth() + 1}/${start.getDate()}`;
+  const endStr = `${end.getMonth() + 1}/${end.getDate()}`;
+  return `${startStr}〜${endStr}`;
+}
+
 type ShortcutKey = "1w" | "2w" | "30d" | "60d" | "m1" | "m2";
 
 function getShortcuts(): { key: ShortcutKey; label: string }[] {
@@ -152,10 +160,15 @@ export function EventForm({ onEventCreated }: EventFormProps) {
       />
 
       <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-        <div className="text-xs font-medium text-gray-400 tracking-wide">詳細設定</div>
+        <div className="text-xs font-medium text-gray-400 tracking-wide text-left">詳細設定</div>
 
         <div className="space-y-2">
-          <span className="text-sm text-gray-600">回答期間</span>
+          <div className="text-left">
+            <span className="text-sm text-gray-600">回答できる期間</span>
+            {startDate && endDate && (
+              <span className="ml-2 text-sm text-red-500 font-medium">{formatDateRange(startDate, endDate)}</span>
+            )}
+          </div>
           <div className="flex gap-1.5 flex-wrap">
             {shortcuts.map(({ key, label }) => (
               <button
