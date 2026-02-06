@@ -18,6 +18,8 @@ interface CalendarProps {
   isSaving: boolean;
   showSaveSuccess: boolean;
   saveError: string | null;
+  startDate?: string;
+  endDate?: string;
 }
 
 export function Calendar({
@@ -34,6 +36,8 @@ export function Calendar({
   isSaving,
   showSaveSuccess,
   saveError,
+  startDate,
+  endDate,
 }: CalendarProps) {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
@@ -50,6 +54,8 @@ export function Calendar({
         getNGCountForDate={getNGCountForDate}
         userId={userId}
         disabled={inputCompleted}
+        startDate={startDate}
+        endDate={endDate}
       />
 
       <CalendarStatus isSaving={isSaving} showSaveSuccess={showSaveSuccess} saveError={saveError} />

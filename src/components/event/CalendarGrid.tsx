@@ -8,6 +8,8 @@ interface CalendarGridProps {
   getNGCountForDate: (date: string) => number;
   userId: string | null;
   disabled?: boolean;
+  startDate?: string;
+  endDate?: string;
 }
 
 export function CalendarGrid({
@@ -17,6 +19,8 @@ export function CalendarGrid({
   getNGCountForDate,
   userId,
   disabled,
+  startDate,
+  endDate,
 }: CalendarGridProps) {
   const days = getDaysInMonth(currentMonth);
   const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
@@ -46,6 +50,7 @@ export function CalendarGrid({
         const ngCount = getNGCountForDate(dateStr);
         const isToday = formatDate(new Date()) === dateStr;
         const isPastDate = day < new Date(new Date().setHours(0, 0, 0, 0));
+        const isOutOfRange = (startDate && dateStr < startDate) || (endDate && dateStr > endDate);
 
         return (
           <CalendarDay
@@ -56,6 +61,7 @@ export function CalendarGrid({
             ngCount={ngCount}
             isToday={isToday}
             isPastDate={isPastDate}
+            isOutOfRange={!!isOutOfRange}
             userId={userId}
             onDateClick={onDateClick}
             disabled={disabled}

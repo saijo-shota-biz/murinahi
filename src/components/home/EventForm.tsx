@@ -4,32 +4,142 @@ import { useState } from "react";
 import { createEvent } from "@/app/actions";
 import { Button, Input } from "@/components/ui";
 import { useClipboard } from "@/hooks";
+import { formatDate, parseDate } from "@/utils/dateHelpers";
 
 interface EventFormProps {
   onEventCreated: (url: string) => void;
 }
 
+function addDaysToDate(base: Date, days: number): string {
+  const d = new Date(base);
+  d.setDate(d.getDate() + days);
+  return formatDate(d);
+}
+
+function getEndOfMonth(year: number, month: number): string {
+  const lastDay = new Date(year, month + 1, 0);
+  return formatDate(lastDay);
+}
+
+function formatDateRange(startDate: string, endDate: string): string {
+  const start = parseDate(startDate);
+  const end = parseDate(endDate);
+  const startStr = `${start.getMonth() + 1}/${start.getDate()}`;
+  const endStr = `${end.getMonth() + 1}/${end.getDate()}`;
+  return `${startStr}〜${endStr}`;
+}
+
+type ShortcutKey = "1w" | "2w" | "30d" | "60d" | "m1" | "m2";
+
+function getShortcuts(): { key: ShortcutKey; label: string }[] {
+  const today = new Date();
+  const currentMonth = today.getMonth();
+
+  const getMonthLabel = (offset: number): string => {
+    const month = (currentMonth + offset) % 12;
+    return `${month + 1}月`;
+  };
+
+  return [
+    { key: "1w", label: "1週間" },
+    { key: "2w", label: "2週間" },
+    { key: "30d", label: "30日" },
+    { key: "60d", label: "60日" },
+    { key: "m1", label: getMonthLabel(1) },
+    { key: "m2", label: getMonthLabel(2) },
+  ];
+}
+
+function getStartOfMonth(year: number, month: number): string {
+  const firstDay = new Date(year, month, 1);
+  return formatDate(firstDay);
+}
+
+function getShortcutDates(key: ShortcutKey): { start: string; end: string } {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = formatDate(tomorrow);
+  const currentMonth = tomorrow.getMonth();
+  const currentYear = tomorrow.getFullYear();
+
+  switch (key) {
+    case "1w":
+      return { start: tomorrowStr, end: addDaysToDate(tomorrow, 6) };
+    case "2w":
+      return { start: tomorrowStr, end: addDaysToDate(tomorrow, 13) };
+    case "30d":
+      return { start: tomorrowStr, end: addDaysToDate(tomorrow, 29) };
+    case "60d":
+      return { start: tomorrowStr, end: addDaysToDate(tomorrow, 59) };
+    case "m1": {
+      const nextMonth = currentMonth + 1;
+      const year = nextMonth > 11 ? currentYear + 1 : currentYear;
+      const month = nextMonth % 12;
+      return { start: getStartOfMonth(year, month), end: getEndOfMonth(year, month) };
+    }
+    case "m2": {
+      const targetMonth = currentMonth + 2;
+      const year = targetMonth > 11 ? currentYear + 1 : currentYear;
+      const month = targetMonth % 12;
+      return { start: getStartOfMonth(year, month), end: getEndOfMonth(year, month) };
+    }
+  }
+}
+
+function getActiveShortcut(startDate: string, endDate: string): ShortcutKey | null {
+  const shortcuts: ShortcutKey[] = ["1w", "2w", "30d", "60d", "m1", "m2"];
+  for (const key of shortcuts) {
+    const dates = getShortcutDates(key);
+    if (startDate === dates.start && endDate === dates.end) {
+      return key;
+    }
+  }
+  return null;
+}
+
 export function EventForm({ onEventCreated }: EventFormProps) {
   const [eventTitle, setEventTitle] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { copyToClipboard } = useClipboard();
 
-  const genUrl = (eventId: string) => {
-    return `${window.location.origin}/event/${eventId}`;
+  const shortcuts = getShortcuts();
+
+  const handleShortcutClick = (key: ShortcutKey) => {
+    setError(null);
+    const dates = getShortcutDates(key);
+
+    if (startDate === dates.start && endDate === dates.end) {
+      setStartDate("");
+      setEndDate("");
+      return;
+    }
+
+    setStartDate(dates.start);
+    setEndDate(dates.end);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsCreating(true);
     try {
-      const eventId = await createEvent(eventTitle);
-      const url = genUrl(eventId);
+      const eventId = await createEvent(eventTitle, startDate || undefined, endDate || undefined);
+      const url = `${window.location.origin}/event/${eventId}`;
       onEventCreated(url);
       await copyToClipboard(url);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      }
     } finally {
       setIsCreating(false);
     }
   };
+
+  const activeShortcut = startDate && endDate ? getActiveShortcut(startDate, endDate) : null;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -42,6 +152,38 @@ export function EventForm({ onEventCreated }: EventFormProps) {
         variant="large"
         className="w-full"
       />
+
+      <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+        <div className="text-xs font-medium text-gray-400 tracking-wide text-left">詳細設定</div>
+
+        <div className="space-y-2">
+          <div className="text-left">
+            <span className="text-sm text-gray-600">回答できる期間</span>
+            {startDate && endDate && (
+              <span className="ml-2 text-sm text-red-500 font-medium">{formatDateRange(startDate, endDate)}</span>
+            )}
+          </div>
+          <div className="flex gap-1.5 flex-wrap">
+            {shortcuts.map(({ key, label }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => handleShortcutClick(key)}
+                aria-pressed={activeShortcut === key}
+                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
+                  activeShortcut === key
+                    ? "bg-red-500 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {error && <p className="text-xs text-red-500">{error}</p>}
+        </div>
+      </div>
+
       <Button
         type="submit"
         loading={isCreating}

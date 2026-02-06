@@ -12,6 +12,8 @@ describe("Calendar", () => {
     userId: "test-user-id",
     participantName: "",
     onNameChange: vi.fn(),
+    inputCompleted: false,
+    onInputCompletedChange: vi.fn(),
     isSaving: false,
     showSaveSuccess: false,
     saveError: null,

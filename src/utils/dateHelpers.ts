@@ -24,3 +24,12 @@ export function formatDate(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
+
+/**
+ * YYYY-MM-DD形式の文字列をローカル時刻のDateオブジェクトに変換
+ * new Date("YYYY-MM-DD")はUTC時刻として解釈されるため、タイムゾーンによって日付がずれる問題を回避
+ */
+export function parseDate(dateStr: string): Date {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
