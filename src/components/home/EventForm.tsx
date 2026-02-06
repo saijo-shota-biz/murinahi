@@ -27,7 +27,7 @@ function getTomorrowString(): string {
   return formatDate(tomorrow);
 }
 
-type ShortcutKey = "1w" | "2w" | "30d" | "60d" | "m0" | "m1" | "m2";
+type ShortcutKey = "1w" | "2w" | "30d" | "60d" | "m1" | "m2";
 
 function getShortcuts(): { key: ShortcutKey; label: string }[] {
   const today = new Date();
@@ -43,7 +43,6 @@ function getShortcuts(): { key: ShortcutKey; label: string }[] {
     { key: "2w", label: "2週間" },
     { key: "30d", label: "30日" },
     { key: "60d", label: "60日" },
-    { key: "m0", label: getMonthLabel(0) },
     { key: "m1", label: getMonthLabel(1) },
     { key: "m2", label: getMonthLabel(2) },
   ];
@@ -70,8 +69,6 @@ function getShortcutDates(key: ShortcutKey): { start: string; end: string } {
       return { start: tomorrowStr, end: addDaysToDate(tomorrow, 29) };
     case "60d":
       return { start: tomorrowStr, end: addDaysToDate(tomorrow, 59) };
-    case "m0":
-      return { start: tomorrowStr, end: getEndOfMonth(currentYear, currentMonth) };
     case "m1": {
       const nextMonth = currentMonth + 1;
       const year = nextMonth > 11 ? currentYear + 1 : currentYear;
@@ -88,7 +85,7 @@ function getShortcutDates(key: ShortcutKey): { start: string; end: string } {
 }
 
 function getActiveShortcut(startDate: string, endDate: string): ShortcutKey | null {
-  const shortcuts: ShortcutKey[] = ["1w", "2w", "30d", "60d", "m0", "m1", "m2"];
+  const shortcuts: ShortcutKey[] = ["1w", "2w", "30d", "60d", "m1", "m2"];
   for (const key of shortcuts) {
     const dates = getShortcutDates(key);
     if (startDate === dates.start && endDate === dates.end) {
