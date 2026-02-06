@@ -21,8 +21,10 @@ function getEndOfMonth(year: number, month: number): string {
   return formatDate(lastDay);
 }
 
-function getTodayString(): string {
-  return formatDate(new Date());
+function getTomorrowString(): string {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return formatDate(tomorrow);
 }
 
 type ShortcutKey = "1w" | "2w" | "30d" | "60d" | "m0" | "m1" | "m2";
@@ -53,22 +55,23 @@ function getStartOfMonth(year: number, month: number): string {
 }
 
 function getShortcutDates(key: ShortcutKey): { start: string; end: string } {
-  const today = new Date();
-  const todayStr = getTodayString();
-  const currentMonth = today.getMonth();
-  const currentYear = today.getFullYear();
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = getTomorrowString();
+  const currentMonth = tomorrow.getMonth();
+  const currentYear = tomorrow.getFullYear();
 
   switch (key) {
     case "1w":
-      return { start: todayStr, end: addDaysToDate(today, 7) };
+      return { start: tomorrowStr, end: addDaysToDate(tomorrow, 6) };
     case "2w":
-      return { start: todayStr, end: addDaysToDate(today, 14) };
+      return { start: tomorrowStr, end: addDaysToDate(tomorrow, 13) };
     case "30d":
-      return { start: todayStr, end: addDaysToDate(today, 30) };
+      return { start: tomorrowStr, end: addDaysToDate(tomorrow, 29) };
     case "60d":
-      return { start: todayStr, end: addDaysToDate(today, 60) };
+      return { start: tomorrowStr, end: addDaysToDate(tomorrow, 59) };
     case "m0":
-      return { start: todayStr, end: getEndOfMonth(currentYear, currentMonth) };
+      return { start: tomorrowStr, end: getEndOfMonth(currentYear, currentMonth) };
     case "m1": {
       const nextMonth = currentMonth + 1;
       const year = nextMonth > 11 ? currentYear + 1 : currentYear;
