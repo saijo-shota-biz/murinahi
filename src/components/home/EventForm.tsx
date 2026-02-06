@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createEvent } from "@/app/actions";
 import { Button, Input } from "@/components/ui";
 import { useClipboard } from "@/hooks";
-import { formatDate } from "@/utils/dateHelpers";
+import { formatDate, parseDate } from "@/utils/dateHelpers";
 
 interface EventFormProps {
   onEventCreated: (url: string) => void;
@@ -28,8 +28,8 @@ function getTomorrowString(): string {
 }
 
 function formatDateRange(startDate: string, endDate: string): string {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+  const start = parseDate(startDate);
+  const end = parseDate(endDate);
   const startStr = `${start.getMonth() + 1}/${start.getDate()}`;
   const endStr = `${end.getMonth() + 1}/${end.getDate()}`;
   return `${startStr}〜${endStr}`;

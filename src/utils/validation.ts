@@ -135,8 +135,12 @@ export function validateEventDateRange(
     throw new Error("終了日の形式が無効です");
   }
 
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+  // YYYY-MM-DD文字列をローカル時刻でパース（new Date(string)はUTC解釈でタイムゾーンずれの原因になる）
+  const [startYear, startMonth, startDay] = startDate.split("-").map(Number);
+  const [endYear, endMonth, endDay] = endDate.split("-").map(Number);
+  const start = new Date(startYear, startMonth - 1, startDay);
+  const end = new Date(endYear, endMonth - 1, endDay);
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
