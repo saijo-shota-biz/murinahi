@@ -16,52 +16,74 @@ function addDaysToDate(base: Date, days: number): string {
   return formatDate(d);
 }
 
-function addMonthsToDate(base: Date, months: number): string {
-  const d = new Date(base);
-  d.setMonth(d.getMonth() + months);
-  return formatDate(d);
+function getEndOfMonth(year: number, month: number): string {
+  const lastDay = new Date(year, month + 1, 0);
+  return formatDate(lastDay);
 }
 
 function getTodayString(): string {
   return formatDate(new Date());
 }
 
-function getMaxDateString(): string {
-  const d = new Date();
-  d.setFullYear(d.getFullYear() + 1);
-  return formatDate(d);
+type ShortcutKey = "1w" | "2w" | "30d" | "60d" | "m0" | "m1" | "m2";
+
+function getShortcuts(): { key: ShortcutKey; label: string }[] {
+  const today = new Date();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+
+  const getMonthLabel = (offset: number): string => {
+    const month = (currentMonth + offset) % 12;
+    return `${month + 1}月`;
+  };
+
+  return [
+    { key: "1w", label: "1週間" },
+    { key: "2w", label: "2週間" },
+    { key: "30d", label: "30日" },
+    { key: "60d", label: "60日" },
+    { key: "m0", label: getMonthLabel(0) },
+    { key: "m1", label: getMonthLabel(1) },
+    { key: "m2", label: getMonthLabel(2) },
+  ];
 }
 
-type ShortcutKey = "1w" | "2w" | "1m" | "2m";
-
-const SHORTCUTS: { key: ShortcutKey; label: string }[] = [
-  { key: "1w", label: "1週間" },
-  { key: "2w", label: "2週間" },
-  { key: "1m", label: "1ヶ月" },
-  { key: "2m", label: "2ヶ月" },
-];
-
-function getShortcutEndDate(key: ShortcutKey): string {
+function getShortcutDates(key: ShortcutKey): { start: string; end: string } {
   const today = new Date();
+  const todayStr = getTodayString();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+
   switch (key) {
     case "1w":
-      return addDaysToDate(today, 7);
+      return { start: todayStr, end: addDaysToDate(today, 7) };
     case "2w":
-      return addDaysToDate(today, 14);
-    case "1m":
-      return addMonthsToDate(today, 1);
-    case "2m":
-      return addMonthsToDate(today, 2);
+      return { start: todayStr, end: addDaysToDate(today, 14) };
+    case "30d":
+      return { start: todayStr, end: addDaysToDate(today, 30) };
+    case "60d":
+      return { start: todayStr, end: addDaysToDate(today, 60) };
+    case "m0":
+      return { start: todayStr, end: getEndOfMonth(currentYear, currentMonth) };
+    case "m1": {
+      const nextMonth = currentMonth + 1;
+      const year = nextMonth > 11 ? currentYear + 1 : currentYear;
+      return { start: todayStr, end: getEndOfMonth(year, nextMonth % 12) };
+    }
+    case "m2": {
+      const targetMonth = currentMonth + 2;
+      const year = targetMonth > 11 ? currentYear + 1 : currentYear;
+      return { start: todayStr, end: getEndOfMonth(year, targetMonth % 12) };
+    }
   }
 }
 
 function getActiveShortcut(startDate: string, endDate: string): ShortcutKey | null {
-  const todayStr = getTodayString();
-  if (startDate !== todayStr) return null;
-
-  for (const shortcut of SHORTCUTS) {
-    if (endDate === getShortcutEndDate(shortcut.key)) {
-      return shortcut.key;
+  const shortcuts: ShortcutKey[] = ["1w", "2w", "30d", "60d", "m0", "m1", "m2"];
+  for (const key of shortcuts) {
+    const dates = getShortcutDates(key);
+    if (startDate === dates.start && endDate === dates.end) {
+      return key;
     }
   }
   return null;
@@ -72,51 +94,37 @@ export function EventForm({ onEventCreated }: EventFormProps) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [dateError, setDateError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { copyToClipboard } = useClipboard();
 
-  const genUrl = (eventId: string) => {
-    return `${window.location.origin}/event/${eventId}`;
-  };
+  const shortcuts = getShortcuts();
 
   const handleShortcutClick = (key: ShortcutKey) => {
-    setDateError(null);
-    const todayStr = getTodayString();
-    const end = getShortcutEndDate(key);
+    setError(null);
+    const dates = getShortcutDates(key);
 
-    // 同じショートカットをもう一度押したらクリア
-    if (startDate === todayStr && endDate === end) {
+    if (startDate === dates.start && endDate === dates.end) {
       setStartDate("");
       setEndDate("");
       return;
     }
 
-    setStartDate(todayStr);
-    setEndDate(end);
-  };
-
-  const handleStartDateChange = (value: string) => {
-    setDateError(null);
-    setStartDate(value);
-  };
-
-  const handleEndDateChange = (value: string) => {
-    setDateError(null);
-    setEndDate(value);
+    setStartDate(dates.start);
+    setEndDate(dates.end);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setDateError(null);
+    setError(null);
     setIsCreating(true);
     try {
       const eventId = await createEvent(eventTitle, startDate || undefined, endDate || undefined);
-      const url = genUrl(eventId);
+      const url = `${window.location.origin}/event/${eventId}`;
       onEventCreated(url);
       await copyToClipboard(url);
-    } catch (error) {
-      if (error instanceof Error) {
-        setDateError(error.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
       }
     } finally {
       setIsCreating(false);
@@ -124,10 +132,6 @@ export function EventForm({ onEventCreated }: EventFormProps) {
   };
 
   const activeShortcut = startDate && endDate ? getActiveShortcut(startDate, endDate) : null;
-  const hasPartialDateRange = Boolean((startDate && !endDate) || (!startDate && endDate));
-
-  const dateInputClass =
-    "w-0 min-w-0 flex-1 px-2 py-1.5 text-sm text-gray-800 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-200 transition-all duration-200";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -145,58 +149,31 @@ export function EventForm({ onEventCreated }: EventFormProps) {
         <div className="text-xs font-medium text-gray-400 tracking-wide">詳細設定</div>
 
         <div className="space-y-2">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <span className="text-sm text-gray-600">回答期間</span>
-            <div className="flex gap-1.5 flex-wrap">
-              {SHORTCUTS.map(({ key, label }) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => handleShortcutClick(key)}
-                  aria-pressed={activeShortcut === key}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
-                    activeShortcut === key
-                      ? "bg-red-500 text-white"
-                      : "bg-white text-gray-600 hover:bg-gray-100"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+          <span className="text-sm text-gray-600">回答期間</span>
+          <div className="flex gap-1.5 flex-wrap">
+            {shortcuts.map(({ key, label }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => handleShortcutClick(key)}
+                aria-pressed={activeShortcut === key}
+                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
+                  activeShortcut === key
+                    ? "bg-red-500 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-          <div className="flex items-center gap-2 max-w-md">
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => handleStartDateChange(e.target.value)}
-              min={getTodayString()}
-              max={getMaxDateString()}
-              aria-label="開始日"
-              className={dateInputClass}
-            />
-            <span className="text-gray-400 text-sm shrink-0">〜</span>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => handleEndDateChange(e.target.value)}
-              min={startDate || getTodayString()}
-              max={getMaxDateString()}
-              aria-label="終了日"
-              className={dateInputClass}
-            />
-          </div>
-          {hasPartialDateRange && (
-            <p className="text-xs text-amber-600">開始日と終了日の両方を入力してください</p>
-          )}
-          {dateError && <p className="text-xs text-red-500">{dateError}</p>}
+          {error && <p className="text-xs text-red-500">{error}</p>}
         </div>
       </div>
 
       <Button
         type="submit"
         loading={isCreating}
-        disabled={hasPartialDateRange}
         size="lg"
         className="group relative px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg shadow-xl hover:shadow-2xl transition-all duration-200"
       >
