@@ -68,7 +68,7 @@ function getShortcutDates(key: ShortcutKey): { start: string; end: string } {
     case "60d":
       return { start: todayStr, end: addDaysToDate(today, 60) };
     case "m0":
-      return { start: getStartOfMonth(currentYear, currentMonth), end: getEndOfMonth(currentYear, currentMonth) };
+      return { start: todayStr, end: getEndOfMonth(currentYear, currentMonth) };
     case "m1": {
       const nextMonth = currentMonth + 1;
       const year = nextMonth > 11 ? currentYear + 1 : currentYear;
