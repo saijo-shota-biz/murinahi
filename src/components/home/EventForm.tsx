@@ -30,7 +30,6 @@ type ShortcutKey = "1w" | "2w" | "30d" | "60d" | "m0" | "m1" | "m2";
 function getShortcuts(): { key: ShortcutKey; label: string }[] {
   const today = new Date();
   const currentMonth = today.getMonth();
-  const currentYear = today.getFullYear();
 
   const getMonthLabel = (offset: number): string => {
     const month = (currentMonth + offset) % 12;
@@ -46,6 +45,11 @@ function getShortcuts(): { key: ShortcutKey; label: string }[] {
     { key: "m1", label: getMonthLabel(1) },
     { key: "m2", label: getMonthLabel(2) },
   ];
+}
+
+function getStartOfMonth(year: number, month: number): string {
+  const firstDay = new Date(year, month, 1);
+  return formatDate(firstDay);
 }
 
 function getShortcutDates(key: ShortcutKey): { start: string; end: string } {
@@ -64,16 +68,18 @@ function getShortcutDates(key: ShortcutKey): { start: string; end: string } {
     case "60d":
       return { start: todayStr, end: addDaysToDate(today, 60) };
     case "m0":
-      return { start: todayStr, end: getEndOfMonth(currentYear, currentMonth) };
+      return { start: getStartOfMonth(currentYear, currentMonth), end: getEndOfMonth(currentYear, currentMonth) };
     case "m1": {
       const nextMonth = currentMonth + 1;
       const year = nextMonth > 11 ? currentYear + 1 : currentYear;
-      return { start: todayStr, end: getEndOfMonth(year, nextMonth % 12) };
+      const month = nextMonth % 12;
+      return { start: getStartOfMonth(year, month), end: getEndOfMonth(year, month) };
     }
     case "m2": {
       const targetMonth = currentMonth + 2;
       const year = targetMonth > 11 ? currentYear + 1 : currentYear;
-      return { start: todayStr, end: getEndOfMonth(year, targetMonth % 12) };
+      const month = targetMonth % 12;
+      return { start: getStartOfMonth(year, month), end: getEndOfMonth(year, month) };
     }
   }
 }

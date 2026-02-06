@@ -140,9 +140,10 @@ export function validateEventDateRange(
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // 開始日は今日以降
-  if (start < today) {
-    throw new Error("開始日は今日以降の日付を指定してください");
+  // 開始日は今月1日以降（月ベースの選択を許可するため）
+  const firstDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  if (start < firstDayOfCurrentMonth) {
+    throw new Error("開始日は今月以降の日付を指定してください");
   }
 
   // 終了日は開始日より後
