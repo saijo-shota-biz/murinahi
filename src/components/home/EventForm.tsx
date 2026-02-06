@@ -21,12 +21,6 @@ function getEndOfMonth(year: number, month: number): string {
   return formatDate(lastDay);
 }
 
-function getTomorrowString(): string {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  return formatDate(tomorrow);
-}
-
 function formatDateRange(startDate: string, endDate: string): string {
   const start = parseDate(startDate);
   const end = parseDate(endDate);
@@ -64,7 +58,7 @@ function getStartOfMonth(year: number, month: number): string {
 function getShortcutDates(key: ShortcutKey): { start: string; end: string } {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowStr = getTomorrowString();
+  const tomorrowStr = formatDate(tomorrow);
   const currentMonth = tomorrow.getMonth();
   const currentYear = tomorrow.getFullYear();
 
